@@ -36,7 +36,6 @@ def procesar_video(input_video_path, output_video_path, output_txt_path, cam="ca
             image2show = frame.copy()
             image2show = cv2.resize(image2show, (704, 576))
             vertices = all_vertices[cam]
-            print(vertices)
 
             # Mostrar el fotograma en una ventana emergente
             for vertice in vertices:
