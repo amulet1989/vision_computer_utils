@@ -32,9 +32,20 @@ print(f"matriz_transformacion {matriz_transformacion2}")
 # puede usar la matriz de perspectiva o la de homografía
 M = matriz_transformacion2
 
-# Salvar la matriz de transformación en el path de la imagen en un archivo csv con el mismo nombre
-with open(image_path.replace(".jpg", ".csv"), "w") as f:
-    f.write(str(M))
+# crear un diccionario para guardar la matriz de transformación respectiva a la camara
+camera_config = {"track7": M.tolist()}
+
+# Guardar la matriz en un archivo YAML
+with open(image_path.replace(".jpg", ".yaml"), "w") as archivo_yaml:
+    yaml.dump(camera_config, archivo_yaml)
+
+# Luego, se puede cargar la matriz desde el archivo YAML
+with open(image_path.replace(".jpg", ".yaml"), "r") as archivo_yaml:
+    diccionario_cargado = yaml.load(archivo_yaml, Loader=yaml.FullLoader)
+    # M = np.array(M)
+
+M = np.array(diccionario_cargado["track7"])
+print(M)
 
 # Aplicar la transformación a la imagen de vigilancia,
 # se deforma la imagen pra que coincidan los puntos de la imagen en el plano de planta
