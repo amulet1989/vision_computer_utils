@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import yaml
+from src.utils import seleccionar_imagen
 
 # Cargar la imagen de vigilancia y el plano de planta
 image_path = "Track_pilar/TRACK_SALIDA_resized.jpg"
@@ -20,20 +21,22 @@ matriz_transformacion = cv2.getPerspectiveTransform(
 print(f"matriz_transformacion {matriz_transformacion}")
 
 # Calcular la matriz de transformación (homografía) con cv2.findHomography
-matriz_transformacion2, _ = cv2.findHomography(
-    puntos_vigilancia, puntos_plano_planta, method=0
-)
+# matriz_transformacion2, _ = cv2.findHomography(
+#    puntos_vigilancia, puntos_plano_planta, method=0
+# )
 # 0 - a regular method using all the points, i.e., the least squares method
 # RANSAC - RANSAC-based robust method
 # LMEDS - Least-Median robust method
 # RHO - PROSAC-based robust method
-print(f"matriz_transformacion {matriz_transformacion2}")
+# print(f"matriz_transformacion {matriz_transformacion2}")
 
 # puede usar la matriz de perspectiva o la de homografía
-M = matriz_transformacion2
+M = matriz_transformacion
 
 # crear un diccionario para guardar la matriz de transformación respectiva a la camara
-camera_config = {"track7": M.tolist()}
+cam_id = image_path.split("/")[-1].replace(".jpg", "")
+cam_ref_point = f"{cam_id}_ref"
+camera_config = {cam_id: M.tolist(), cam_ref_point: "center"}
 
 # Guardar la matriz en un archivo YAML
 with open(image_path.replace(".jpg", ".yaml"), "w") as archivo_yaml:
@@ -44,7 +47,7 @@ with open(image_path.replace(".jpg", ".yaml"), "r") as archivo_yaml:
     diccionario_cargado = yaml.load(archivo_yaml, Loader=yaml.FullLoader)
     # M = np.array(M)
 
-M = np.array(diccionario_cargado["track7"])
+M = np.array(diccionario_cargado[cam_id])
 print(M)
 
 # Aplicar la transformación a la imagen de vigilancia,
