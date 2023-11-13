@@ -9,12 +9,12 @@ import shutil
 def start_gst_pipelines(record_time, output_path):
     # Obtener la fecha y hora actual para generar nombres de archivo
     current_datetime = time.strftime("%Y%m%d_%H%M%S")
-
+    # nvv4l2decoder
     commands = [
-        f"gst-launch-1.0 rtspsrc location=rtsp://admin:2Mini001.@192.168.88.122 ! application/x-rtp, media=video, encoding-name=H265! queue ! rtph265depay ! h265parse ! nvv4l2decoder ! nvvidconv ! 'video/x-raw(memory:NVMM),width=1280,height=720' ! nvv4l2h265enc ! h265parse ! matroskamux ! filesink location={output_path}/camera122_{current_datetime}_h265.mkv",
-        f"gst-launch-1.0 rtspsrc location=rtsp://admin:2Mini001.@192.168.88.52 ! application/x-rtp, media=video, encoding-name=H265! queue ! rtph265depay ! h265parse ! nvv4l2decoder ! nvvidconv ! 'video/x-raw(memory:NVMM),width=1280,height=720' ! nvv4l2h265enc ! h265parse ! matroskamux ! filesink location={output_path}/camera52_{current_datetime}_h265.mkv",
-        f"gst-launch-1.0 rtspsrc location=rtsp://admin:2Mini001.@192.168.88.62 ! application/x-rtp, media=video, encoding-name=H265! queue ! rtph265depay ! h265parse ! nvv4l2decoder ! nvvidconv ! 'video/x-raw(memory:NVMM),width=1280,height=720' ! nvv4l2h265enc ! h265parse ! matroskamux ! filesink location={output_path}/camera62_{current_datetime}_h265.mkv",
-        f"gst-launch-1.0 rtspsrc location=rtsp://admin:2Mini001.@192.168.88.71 ! application/x-rtp, media=video, encoding-name=H265! queue ! rtph265depay ! h265parse ! nvv4l2decoder ! nvvidconv ! 'video/x-raw(memory:NVMM),width=1280,height=720' ! nvv4l2h265enc ! h265parse ! matroskamux ! filesink location={output_path}/camera71_{current_datetime}_h265.mkv",
+        f"gst-launch-1.0 rtspsrc location=rtsp://admin:2Mini001.@192.168.88.122 ! application/x-rtp, media=video, encoding-name=H265! queue ! rtph265depay ! h265parse ! avdec_h265 ! nvvidconv ! 'video/x-raw(memory:NVMM),width=1280,height=720' ! nvv4l2h265enc ! h265parse ! matroskamux ! filesink location={output_path}/camera122_{current_datetime}_h265.mkv",
+        f"gst-launch-1.0 rtspsrc location=rtsp://admin:2Mini001.@192.168.88.52 ! application/x-rtp, media=video, encoding-name=H265! queue ! rtph265depay ! h265parse ! avdec_h265 ! nvvidconv ! 'video/x-raw(memory:NVMM),width=1280,height=720' ! nvv4l2h265enc ! h265parse ! matroskamux ! filesink location={output_path}/camera52_{current_datetime}_h265.mkv",
+        f"gst-launch-1.0 rtspsrc location=rtsp://admin:2Mini001.@192.168.88.62 ! application/x-rtp, media=video, encoding-name=H265! queue ! rtph265depay ! h265parse ! avdec_h265 ! nvvidconv ! 'video/x-raw(memory:NVMM),width=1280,height=720' ! nvv4l2h265enc ! h265parse ! matroskamux ! filesink location={output_path}/camera62_{current_datetime}_h265.mkv",
+        f"gst-launch-1.0 rtspsrc location=rtsp://admin:2Mini001.@192.168.88.71 ! application/x-rtp, media=video, encoding-name=H265! queue ! rtph265depay ! h265parse ! avdec_h265 ! nvvidconv ! 'video/x-raw(memory:NVMM),width=1280,height=720' ! nvv4l2h265enc ! h265parse ! matroskamux ! filesink location={output_path}/camera71_{current_datetime}_h265.mkv",
     ]
 
     process_group = []
