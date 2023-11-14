@@ -81,3 +81,47 @@ def resize_images_in_directory(directory_path, width, height):
         if os.path.isfile(file_path):
             resize_image(file_path, width, height)
     return None
+
+
+# obtener el frame n de un video y guardarlo como una imagen jpg
+def get_frame_from_video(video_path, frame_number, width, height):
+    video = cv2.VideoCapture(video_path)
+    # obtener el frame n del video
+    video.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
+    ret, frame = video.read()
+    # guardar la imagen como un archivo jpg
+    cv2.imwrite(f"frame_{frame_number}.jpg", frame)
+    # redimensionar la imagen
+    resized_frame = cv2.resize(frame, (width, height))
+    return resized_frame
+
+
+# hacer resize de un video y guardarlo con el sufijo resized
+def resize_video(video_path, width, height):
+    cap = cv2.VideoCapture(video_path)
+
+    # Definir el códec y el objeto VideoWriter
+    fourcc = cv2.VideoWriter_fourcc(*"H264")
+
+    # Crear un objeto VideoWriter para guardar el video redimensionado
+    output_path = video_path.replace(
+        ".mp4", "_resized.mp4"
+    )  # Añade el sufijo "_resized" al nombre del archivo de salida
+    out = cv2.VideoWriter(
+        output_path, fourcc, 5.0, (width, height)
+    )  # 30 es la velocidad de fotogramas (puedes ajustarla)
+
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        # Redimensionar el cuadro al tamaño deseado
+        frame = cv2.resize(frame, (width, height))
+
+        # Escribir el cuadro redimensionado en el archivo de salida
+        out.write(frame)
+
+    cap.release()
+    out.release()
+    cv2.destroyAllWindows()

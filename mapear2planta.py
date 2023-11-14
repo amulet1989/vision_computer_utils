@@ -4,13 +4,13 @@ import yaml
 from src.utils import seleccionar_imagen
 
 # Cargar la imagen de vigilancia y el plano de planta
-image_path = "Track_pilar/TRACK_SALIDA_resized.jpg"
+image_path = "Track_pilar/ENTRADA 1_ENTRADA_main.jpg"
 imagen_vigilancia = cv2.imread(image_path)
 plano_planta = cv2.imread("Track_pilar/planta_pilar_crop.jpg")
 
 # Puntos de interés manual (deben coincidir en la imagen y en el palno de planta)
-puntos_vigilancia = np.float32([[198, 461], [198, 129], [554, 125], [558, 449]])
-puntos_plano_planta = np.float32([[404, 853], [432, 717], [220, 677], [196, 817]])
+puntos_vigilancia = np.float32([[145, 334], [277, 154], [501, 362], [289, 554]])
+puntos_plano_planta = np.float32([[634, 762], [602, 902], [410, 858], [494, 734]])
 
 # Hay dos formas de calcular la matriz de transformación:
 
@@ -59,8 +59,9 @@ imagen_vigilancia_mapeada = cv2.warpPerspective(
 )
 
 # Definir puntos a mapear, para validar la transformación.
-punto_imagen_vigilancia = [[677, 294]]
+punto_imagen_vigilancia = [[375, 244]]  # [195, 256], [375, 244], [455, 476]
 punto_imagen_vigilancia = np.array([punto_imagen_vigilancia], dtype=np.float32)
+print("Punto-", punto_imagen_vigilancia)
 
 # Aplicar la transformación al punto
 punto_plano_planta = cv2.perspectiveTransform(

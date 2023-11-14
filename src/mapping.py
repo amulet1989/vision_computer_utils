@@ -3,21 +3,35 @@ import numpy as np
 import cv2
 
 # Luego, se puede cargar la matriz desde el archivo YAML
-with open("mapping_cfg.yaml", "r") as archivo_yaml:
+with open("config/mapping_cfg.yaml", "r") as archivo_yaml:
     diccionario_cargado = yaml.load(archivo_yaml, Loader=yaml.FullLoader)
     # M = np.array(M)
 
 
 # Recibir un BBox y determinar su posicion en el plano d eplanta
-def bbox_to_planta(bbox, M, cam_id):
+def bbox_to_planta(bbox, cam_id):
+    print("BBox", bbox)
+
     M = np.array(diccionario_cargado[cam_id])
+    print("Matriz ", M)
+
     # Obtener el punto medio del segmento de bbox inferior
-    punto_bbox = [int(bbox[0] + bbox[2] / 2), int(bbox[1] + bbox[3])]
-    punto_bbox = np.array([punto_bbox], dtype=np.float32)
+    punto_bbox = np.array(
+        [[[(bbox[0] + bbox[2]) / 2, bbox[3]]]], dtype=np.float32
+    )  # bbox[0] + bbox[1] / 2, bbox[3]
+    print("Punto ", punto_bbox)
+
+    # Convertir el punto medio del bbox inferior a un array
+    # punto_bbox = np.array(punto_bbox, dtype=np.float32)
+    # print("Punto ", punto_bbox)
 
     # Aplicar la transformación al punto
     punto_bbox_planta = cv2.perspectiveTransform(
         punto_bbox,
         M,  # puede usar la matriz de perspectiva o la de homografía
     )
-    return punto_bbox_planta
+    plano_x_y = [x for x in np.array(punto_bbox_planta[0][:][:], dtype=np.int16)]
+    punto_bbox = [x for x in np.array(punto_bbox[0][:][:], dtype=np.int16)]
+
+    print("Punto en plano", plano_x_y)
+    return plano_x_y, punto_bbox
