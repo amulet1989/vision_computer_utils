@@ -4,9 +4,8 @@ from src.utils import seleccionar_video
 from src.mapping import bbox_to_planta
 
 
-model = YOLO("yolov8n.pt")  # train_models/yolov8n_4cam.pt
+model = YOLO("train_models/yolov8n.pt")  # train_models/yolov8n_4cam.pt
 # model = RTDETR("rtdetr-l.pt")  # rtdetr-l.pt
-
 
 # Create VideoCapture object
 INPUT_VIDEO = seleccionar_video()
@@ -83,7 +82,7 @@ for r in results:
 
     cv2.imshow(win_name, image)
 
-    escala = 0.75  # Puedes ajustar este valor según tus necesidades
+    escala = 0.75  # Se puede ajustar este valor para achicar la imagen
     plano_planta_show = cv2.resize(plano_planta, None, fx=escala, fy=escala)
     cv2.imshow("Plano de Planta", plano_planta_show)
 

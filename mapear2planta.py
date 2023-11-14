@@ -59,7 +59,12 @@ imagen_vigilancia_mapeada = cv2.warpPerspective(
 )
 
 # Definir puntos a mapear, para validar la transformación.
-punto_imagen_vigilancia = [[375, 244]]  # [195, 256], [375, 244], [455, 476]
+punto_imagen_vigilancia = [
+    [220, 350],
+    [304, 238],
+    [420, 342],
+    [336, 502],
+]  # [195, 256], [375, 244], [455, 476]
 punto_imagen_vigilancia = np.array([punto_imagen_vigilancia], dtype=np.float32)
 print("Punto-", punto_imagen_vigilancia)
 
