@@ -4,7 +4,7 @@ from src.utils import seleccionar_video
 from src.mapping import bbox_to_planta
 
 
-model = YOLO("train_models/yolov8n.pt")  # train_models/yolov8n_4cam.pt
+model = YOLO("train_models/yolov8n_4cam.pt")  # train_models/yolov8n_4cam.pt
 # model = RTDETR("rtdetr-l.pt")  # rtdetr-l.pt
 
 # Create VideoCapture object
@@ -12,17 +12,25 @@ INPUT_VIDEO = seleccionar_video()
 # INPUT_VIDEO = "rtsp://admin:2Mini001.@192.168.88.71"
 
 plano_planta = cv2.imread(
-    "Track_pilar/planta_pilar_crop.jpg"
-)  # Cargar la imagen del plano de planta
+    "Track_CF/CF_plano.jpg"
+)  # Cargar la imagen del plano de planta / Track_pilar/planta_pilar_crop.jpg
 
 # Read video
 cap = cv2.VideoCapture(INPUT_VIDEO)
 win_name = "Camera Preview"
 cv2.namedWindow(win_name, cv2.WINDOW_NORMAL)
+# Cambiar el tamaño de la ventana
+cv2.resizeWindow(win_name, 704, 576)
 
 classes = 0
 results = model.track(
-    source=INPUT_VIDEO, stream=True, save=False, conf=0.7, imgsz=704, classes=classes
+    source=INPUT_VIDEO,
+    stream=True,
+    save=False,
+    conf=0.8,
+    # iou=0.8,
+    imgsz=704,
+    # classes=classes,
 )  # generator of Results objects
 
 for r in results:
@@ -35,6 +43,7 @@ for r in results:
         scores = boxes.conf.tolist()  # Confidence scores
 
         points_to_plot = []  # Almacenar los puntos mapeados
+        bb_to_plot = []
 
         # Draw BBoxes on the image
         # for box, label, score in zip(boxes, labels, scores):
@@ -60,29 +69,36 @@ for r in results:
 
             # Mapear el punto en el plano de planta
             mapped_point, bb = bbox_to_planta(
-                box, cam_id="ENTRADA 1_ENTRADA_main"
+                box, cam_id="camera71"  # "TRACK_1"  # "ENTRADA 1_ENTRADA_main"
             )  # Función para mapear el punto a las coordenadas en el plano de planta
 
             # Comprobar si el punto mapeado está dentro de los límites de la imagen del plano de planta
-            for point in mapped_point:
+            for point, b in zip(mapped_point, bb):
                 x, y = point
-                if 0 <= x < plano_planta.shape[1] and 0 <= y < plano_planta.shape[0]:
+                x1, y1 = b
+                if (
+                    0 <= x < plano_planta.shape[1]
+                    and 0 <= y < plano_planta.shape[0]
+                    and 0 <= x1 < image.shape[1]
+                    and 0 <= y1 < image.shape[0]
+                ):
                     points_to_plot.append(point)
+                    bb_to_plot.append(b)
 
         # Dibujar los puntos en la imagen del plano de planta
-        for point, b in zip(points_to_plot, bb):
-            print("point", point, b)
+        for point, b in zip(points_to_plot, bb_to_plot):
+            # print("point", point, b)
             cv2.circle(
                 plano_planta, point, 5, (0, 0, 255), -1
             )  # Dibujar un círculo rojo en la posición mapeada
             cv2.circle(
                 image, b, 5, (0, 0, 255), -1
-            )  # Dibujar un círculo rojo en la posición mapeada) in points_to_plot:
-            print("point", point, b)
+            )  # Dibujar un círculo rojo en la posición mapeada
+            # print("point", point, b)
 
     cv2.imshow(win_name, image)
 
-    escala = 0.75  # Se puede ajustar este valor para achicar la imagen
+    escala = 0.5  # Se puede ajustar este valor para achicar la imagen
     plano_planta_show = cv2.resize(plano_planta, None, fx=escala, fy=escala)
     cv2.imshow("Plano de Planta", plano_planta_show)
 

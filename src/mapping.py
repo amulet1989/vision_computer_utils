@@ -2,16 +2,17 @@ import yaml
 import numpy as np
 import cv2
 
-# Luego, se puede cargar la matriz desde el archivo YAML
-with open("config/mapping_cfg.yaml", "r") as archivo_yaml:
+# Cargar la matrices de transformacion desde el archivo YAML
+with open("config/mapping_cfg_cf.yaml", "r") as archivo_yaml:
     diccionario_cargado = yaml.load(archivo_yaml, Loader=yaml.FullLoader)
     # M = np.array(M)
 
 
-# Recibir un BBox y determinar su posicion en el plano d eplanta
+# Recibir un BBox y el id de camara y determinar su posicion en el plano de planta
 def bbox_to_planta(bbox, cam_id):
     # print("BBox", bbox)
 
+    # Leer la matriz de transformación correspondiente
     M = np.array(diccionario_cargado[cam_id])
 
     # Obtener el punto de referencia
@@ -34,5 +35,6 @@ def bbox_to_planta(bbox, cam_id):
     plano_x_y = [x for x in np.array(punto_bbox_planta[0][:][:], dtype=np.int16)]
     punto_bbox = [x for x in np.array(punto_bbox[0][:][:], dtype=np.int16)]
 
-    # print("Punto en plano", plano_x_y)
+    # print("BBox", bbox)
+    # print("Punto en plano", plano_x_y, punto_bbox)
     return plano_x_y, punto_bbox

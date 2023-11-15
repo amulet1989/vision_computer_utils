@@ -10,12 +10,7 @@ def seleccionar_video():
 
     file_path = filedialog.askopenfilename(
         title="Seleccionar una imagen",
-        filetypes=[
-            (
-                "Archivos de video",
-                "*.mp4",
-            )
-        ],
+        filetypes=[("Archivos de video", "*.mp4")],
     )
 
     if file_path:
@@ -90,7 +85,7 @@ def get_frame_from_video(video_path, frame_number, width, height):
     video.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
     ret, frame = video.read()
     # guardar la imagen como un archivo jpg
-    cv2.imwrite(f"frame_{frame_number}.jpg", frame)
+    # cv2.imwrite(f"frame_{frame_number}.jpg", frame)
     # redimensionar la imagen
     resized_frame = cv2.resize(frame, (width, height))
     return resized_frame
