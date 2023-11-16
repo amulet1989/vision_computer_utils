@@ -73,6 +73,7 @@ for r in results:
             )  # Función para mapear el punto a las coordenadas en el plano de planta
 
             # Comprobar si el punto mapeado está dentro de los límites de la imagen del plano de planta
+            # estos es solo para fines de visualizacion para la funcion que dibuja los puntos
             for point, b in zip(mapped_point, bb):
                 x, y = point
                 x1, y1 = b

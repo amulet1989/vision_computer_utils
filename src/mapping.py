@@ -22,7 +22,7 @@ def bbox_to_planta(bbox, cam_id):
     elif ref_point == "down_corner":
         punto_bbox = np.array([[[bbox[2], bbox[3]]]], dtype=np.float32)
     else:
-        # Usar centro del bbox como punto de referencia
+        # Sino es ninguno de los anteriores usar "center" del bbox por defecto
         punto_bbox = np.array(
             [[[(bbox[2] + bbox[0]) / 2, (bbox[3] + bbox[1]) / 2]]], dtype=np.float32
         )
@@ -32,9 +32,13 @@ def bbox_to_planta(bbox, cam_id):
         punto_bbox,
         M,  # puede usar la matriz de perspectiva o la de homografía
     )
-    plano_x_y = [x for x in np.array(punto_bbox_planta[0][:][:], dtype=np.int16)]
-    punto_bbox = [x for x in np.array(punto_bbox[0][:][:], dtype=np.int16)]
 
-    # print("BBox", bbox)
-    # print("Punto en plano", plano_x_y, punto_bbox)
+    # Llevar los puntos a las coordenadas de enteros mas cercano
+    punto_bbox = np.rint(np.array(punto_bbox)).astype(np.int16)[0]
+    plano_x_y = np.rint(np.array(punto_bbox_planta)).astype(np.int16)[0]
+
+    # plano_x_y = [x for x in np.array(punto_bbox_planta[0][:][:], dtype=np.int16)]
+    # punto_bbox = [x for x in np.array(punto_bbox[0][:][:], dtype=np.int16)]
+
+    # print("Punto en plano", plano_x_y, "Punto camara", punto_bbox)
     return plano_x_y, punto_bbox

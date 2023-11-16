@@ -2,15 +2,16 @@ import cv2
 import numpy as np
 import yaml
 from src.utils import seleccionar_imagen
+from src.mapping import bbox_to_planta
 
 # Cargar la imagen de vigilancia y el plano de planta
-image_path = "Track_CF/camera52.jpg"
+image_path = "Track_CF/camera71.jpg"
 imagen_vigilancia = cv2.imread(image_path)
 plano_planta = cv2.imread("Track_CF/CF_plano.jpg")
 
 # Puntos de interés manual (deben coincidir en la imagen y en el palno de planta)
-puntos_vigilancia = np.float32([[256, 378], [356, 146], [472, 66], [584, 378]])
-puntos_plano_planta = np.float32([[1090, 456], [1450, 456], [1850, 668], [1102, 668]])
+puntos_vigilancia = np.float32([[159, 560], [87, 160], [163, 80], [375, 148]])
+puntos_plano_planta = np.float32([[204, 466], [672, 582], [708, 686], [324, 670]])
 
 # Hay dos formas de calcular la matriz de transformación:
 
@@ -45,13 +46,16 @@ with open(image_path.replace(".jpg", ".yaml"), "w") as archivo_yaml:
 # Luego, se puede cargar la matriz desde el archivo YAML
 with open(image_path.replace(".jpg", ".yaml"), "r") as archivo_yaml:
     diccionario_cargado = yaml.load(archivo_yaml, Loader=yaml.FullLoader)
-    # M = np.array(M)
+
+# # Cargar la matriz de transformación desde el archivo YAML general
+# with open("config/mapping_cfg_cf.yaml", "r") as archivo_yaml:
+#     diccionario_cargado = yaml.load(archivo_yaml, Loader=yaml.FullLoader)
 
 M = np.array(diccionario_cargado[cam_id])
 print(M)
 
 # Aplicar la transformación a la imagen de vigilancia,
-# se deforma la imagen pra que coincidan los puntos de la imagen en el plano de planta
+# se deforma la imagen para que coincidan los puntos de la imagen en el plano de planta
 imagen_vigilancia_mapeada = cv2.warpPerspective(
     imagen_vigilancia,
     M,  # puede usar la matriz de perspectiva o la de homografía
@@ -60,20 +64,20 @@ imagen_vigilancia_mapeada = cv2.warpPerspective(
 
 # Definir puntos a mapear, para validar la transformación.
 punto_imagen_vigilancia = [
-    [591, 256],
-    [247, 496],
-    [383, 196],
+    [595, 424],
+    [375, 144],
+    [83, 156],
+    [59, 384],
+    [167, 560],
 ]  # [195, 256], [375, 244], [455, 476]
 punto_imagen_vigilancia = np.array([punto_imagen_vigilancia], dtype=np.float32)
-print("Punto-", punto_imagen_vigilancia)
+# print("Punto-", punto_imagen_vigilancia)
 
 # Aplicar la transformación al punto
 punto_plano_planta = cv2.perspectiveTransform(
     punto_imagen_vigilancia,
     M,  # puede usar la matriz de perspectiva o la de homografía
 )
-
-print(punto_plano_planta)
 
 # Extrare las coordenadas en el plano de planta en la forma (x, y)
 imagen_x_y = [x for x in np.array(punto_imagen_vigilancia[0][:][:], dtype=np.int16)]
