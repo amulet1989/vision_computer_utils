@@ -33,9 +33,9 @@ def bbox_to_planta(bbox, cam_id):
         M,  # puede usar la matriz de perspectiva o la de homografía
     )
 
-    # Llevar los puntos a las coordenadas de enteros mas cercano
-    punto_bbox = np.rint(np.array(punto_bbox)).astype(np.int16)[0]
-    plano_x_y = np.rint(np.array(punto_bbox_planta)).astype(np.int16)[0]
+    # Llevar los puntos a las coordenadas de enteros mas cercano () o al entero inferior (np.rint(np.array(punto_bbox)))
+    punto_bbox = np.floor(np.array(punto_bbox)).astype(np.int16)[0]
+    plano_x_y = np.floor(np.array(punto_bbox_planta)).astype(np.int16)[0]
 
     # plano_x_y = [x for x in np.array(punto_bbox_planta[0][:][:], dtype=np.int16)]
     # punto_bbox = [x for x in np.array(punto_bbox[0][:][:], dtype=np.int16)]
