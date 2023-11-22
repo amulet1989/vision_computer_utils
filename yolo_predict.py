@@ -3,6 +3,18 @@ from ultralytics import YOLO
 from src.utils import seleccionar_video
 from src.mapping import bbox_to_planta
 
+# import matplotlib.pyplot as plt
+import numpy as np
+
+
+def map_number_to_color(number):
+    np.random.seed(int(number))
+
+    # Generar un color aleatorio único
+    color = np.random.randint(0, 256, size=3)
+
+    return tuple(int(x) for x in color)
+
 
 model = YOLO("train_models/yolov8n_4cam.pt")  # train_models/yolov8n_4cam.pt
 # model = RTDETR("rtdetr-l.pt")  # rtdetr-l.pt
@@ -13,7 +25,7 @@ INPUT_VIDEO = seleccionar_video()
 
 plano_planta = cv2.imread(
     "Track_CF/CF_plano.jpg"
-)  # Cargar la imagen del plano de planta / Track_pilar/planta_pilar_crop.jpg
+)  # Cargar la imagen del plano de planta -> Track_pilar/planta_pilar_crop.jpg - Track_CF/CF_plano.jpg
 
 # Read video
 cap = cv2.VideoCapture(INPUT_VIDEO)
@@ -26,7 +38,7 @@ classes = 0
 results = model.track(
     source=INPUT_VIDEO,
     stream=True,
-    save=False,
+    save=True,
     conf=0.8,
     # iou=0.8,
     imgsz=704,
@@ -44,6 +56,7 @@ for r in results:
 
         points_to_plot = []  # Almacenar los puntos mapeados
         bb_to_plot = []
+        id_number = []
 
         # Draw BBoxes on the image
         # for box, label, score in zip(boxes, labels, scores):
@@ -51,7 +64,7 @@ for r in results:
             x1, y1, x2, y2 = map(int, box)  # box
             color = (0, 255, 0)  # Green color
             thickness = 2
-
+            # print(boxes.id)
             cv2.rectangle(image, (x1, y1), (x2, y2), color, thickness)
 
             text = f"{label[int(classe[i])]} ({scores[i]:.2f})"
@@ -69,7 +82,8 @@ for r in results:
 
             # Mapear el punto en el plano de planta
             mapped_point, bb = bbox_to_planta(
-                box, cam_id="camera71"  # "TRACK_1"  # "ENTRADA 1_ENTRADA_main"
+                box,
+                cam_id="camera62",  # camera62/camera72/camera52/camera122 "TRACK_1"  # "ENTRADA 1_ENTRADA_main"
             )  # Función para mapear el punto a las coordenadas en el plano de planta
 
             # Comprobar si el punto mapeado está dentro de los límites de la imagen del plano de planta
@@ -83,17 +97,25 @@ for r in results:
                     and 0 <= x1 < image.shape[1]
                     and 0 <= y1 < image.shape[0]
                 ):
-                    points_to_plot.append(point)
-                    bb_to_plot.append(b)
+                    if boxes.id is not None:
+                        points_to_plot.append(point)
+                        bb_to_plot.append(b)
+                        id_number.append(boxes.id[i])
+                        # print("id ", boxes.id[i], "point ", point, "b ", b)
 
         # Dibujar los puntos en la imagen del plano de planta
-        for point, b in zip(points_to_plot, bb_to_plot):
+        # cont = 0
+        for point, b, id_num in zip(points_to_plot, bb_to_plot, id_number):
             # print("point", point, b)
+            # if boxes.id is not None:
+            color = map_number_to_color(id_num)
+            # print(id_num, "->", color)
+            # cont += 1
             cv2.circle(
-                plano_planta, point, 5, (0, 0, 255), -1
-            )  # Dibujar un círculo rojo en la posición mapeada
+                plano_planta, point, 5, color, -1
+            )  # Dibujar un círculo rojo en la posición mapeada -> rojo (0, 0, 255)
             cv2.circle(
-                image, b, 5, (0, 0, 255), -1
+                image, b, 5, color, -1
             )  # Dibujar un círculo rojo en la posición mapeada
             # print("point", point, b)
 
