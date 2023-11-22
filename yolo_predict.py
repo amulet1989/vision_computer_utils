@@ -16,8 +16,8 @@ def map_number_to_color(number):
     return tuple(int(x) for x in color)
 
 
+# Cargar modelo YOLO
 model = YOLO("train_models/yolov8n_4cam.pt")  # train_models/yolov8n_4cam.pt
-# model = RTDETR("rtdetr-l.pt")  # rtdetr-l.pt
 
 # Create VideoCapture object
 INPUT_VIDEO = seleccionar_video()
@@ -31,14 +31,15 @@ plano_planta = cv2.imread(
 cap = cv2.VideoCapture(INPUT_VIDEO)
 win_name = "Camera Preview"
 cv2.namedWindow(win_name, cv2.WINDOW_NORMAL)
-# Cambiar el tamaño de la ventana
+
+# Ajustar el tamaño de la ventana de salida del video
 cv2.resizeWindow(win_name, 704, 576)
 
-classes = 0
+# classes = 0
 results = model.track(
     source=INPUT_VIDEO,
     stream=True,
-    save=True,
+    save=False,
     conf=0.8,
     # iou=0.8,
     imgsz=704,
@@ -53,10 +54,6 @@ for r in results:
         classe = boxes.cls.tolist()
         label = r.names
         scores = boxes.conf.tolist()  # Confidence scores
-
-        points_to_plot = []  # Almacenar los puntos mapeados
-        bb_to_plot = []  # Almacenar las coordanadas de imagen
-        id_color = []  # Almacenar los colores por ID
 
         # Draw BBoxes on the image
         # for box, label, score in zip(boxes, labels, scores):
@@ -88,7 +85,7 @@ for r in results:
             # Mapear el punto en el plano de planta, acá se debe poner el id correcto de camara relativo al .yaml de configuracion
             mapped_point, bb = bbox_to_planta(
                 box,
-                cam_id="camera71",  # camera62/camera71/camera52/camera122
+                cam_id="camera52",  # camera62/camera71/camera52/camera122
             )  # Función para mapear el punto a las coordenadas en el plano de planta
 
             # Comprobar si el punto mapeado está dentro de los límites de la imagen
@@ -102,23 +99,13 @@ for r in results:
                 and 0 <= x1 < image.shape[1]
                 and 0 <= y1 < image.shape[0]
             ):
-                # se añaden todas las coordenadas de los puntos a una lista para luego dibujarlos en las imagenes
-                points_to_plot.append([x, y])
-                bb_to_plot.append([x1, y1])
-                id_color.append(color)
-
-        # Dibujar los puntos en las imágenes
-        for point, b, id_c in zip(points_to_plot, bb_to_plot, id_color):
-            # print("point", point, b)
-            color = id_c
-            # print(id_num, "->", color)
-            cv2.circle(
-                plano_planta, point, 5, color, -1
-            )  # Dibujar un círculo rojo en la posición mapeada -> rojo (0, 0, 255)
-            cv2.circle(
-                image, b, 5, color, -1
-            )  # Dibujar un círculo rojo en la posición mapeada
-            # print("point", point, b)
+                # Dibujar los puntos en las imágenes
+                cv2.circle(
+                    plano_planta, [x, y], 5, color, -1
+                )  # Dibujar un círculo en la posición mapeada -> rojo (0, 0, 255)
+                cv2.circle(
+                    image, [x1, y1], 5, color, -1
+                )  # Dibujar un círculo en la posición mapeada
 
     cv2.imshow(win_name, image)
 
