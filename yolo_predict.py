@@ -55,20 +55,25 @@ for r in results:
         scores = boxes.conf.tolist()  # Confidence scores
 
         points_to_plot = []  # Almacenar los puntos mapeados
-        bb_to_plot = []
-        id_number = []
+        bb_to_plot = []  # Almacenar las coordanadas de imagen
+        id_color = []  # Almacenar los colores por ID
 
         # Draw BBoxes on the image
         # for box, label, score in zip(boxes, labels, scores):
         for i, box in enumerate(boxes.xyxy):
-            x1, y1, x2, y2 = map(int, box)  # box
-            color = (0, 255, 0)  # Green color
-            thickness = 2
-            # print(boxes.id)
-            cv2.rectangle(image, (x1, y1), (x2, y2), color, thickness)
+            # print(boxes)
+            # Por alguna razón algunas detecciones dan ID None, en ese caso se salta la impresion
+            if boxes.id == None:
+                continue
 
+            # Dibujar el rectángulo y el texto
+            x1, y1, x2, y2 = map(int, box)  # box
+            # Asignar un color por ID
+            color = map_number_to_color(boxes.id[i])  # (0, 255, 0)  # Green color
+            thickness = 2
+            cv2.rectangle(image, (x1, y1), (x2, y2), color, thickness)
             text = f"{label[int(classe[i])]} ({scores[i]:.2f})"
-            print(text)
+            # print(text)
 
             cv2.putText(
                 image,
@@ -80,15 +85,15 @@ for r in results:
                 thickness,
             )
 
-            # Mapear el punto en el plano de planta
+            # Mapear el punto en el plano de planta, acá se debe poner el id correcto de camara relativo al .yaml de configuracion
             mapped_point, bb = bbox_to_planta(
                 box,
-                cam_id="camera71",  # camera62/camera71/camera52/camera122 "TRACK_1"  # "ENTRADA 1_ENTRADA_main"
+                cam_id="camera71",  # camera62/camera71/camera52/camera122
             )  # Función para mapear el punto a las coordenadas en el plano de planta
 
-            # Comprobar si el punto mapeado está dentro de los límites de la imagen del plano de planta
+            # Comprobar si el punto mapeado está dentro de los límites de la imagen
             # estos es solo para fines de visualizacion para la funcion que dibuja los puntos
-            print(mapped_point)
+            # print(mapped_point)
             x, y = mapped_point[0]
             x1, y1 = bb[0]
             if (
@@ -97,34 +102,16 @@ for r in results:
                 and 0 <= x1 < image.shape[1]
                 and 0 <= y1 < image.shape[0]
             ):
-                if boxes.id is not None:
-                    points_to_plot.append([x, y])
-                    bb_to_plot.append([x1, y1])
-                    id_number.append(boxes.id[i])
+                # se añaden todas las coordenadas de los puntos a una lista para luego dibujarlos en las imagenes
+                points_to_plot.append([x, y])
+                bb_to_plot.append([x1, y1])
+                id_color.append(color)
 
-            # for point, b in zip(mapped_point, bb):
-            #     x, y = point
-            #     x1, y1 = b
-            #     if (
-            #         0 <= x < plano_planta.shape[1]
-            #         and 0 <= y < plano_planta.shape[0]
-            #         and 0 <= x1 < image.shape[1]
-            #         and 0 <= y1 < image.shape[0]
-            #     ):
-            #         if boxes.id is not None:
-            #             points_to_plot.append(point)
-            #             bb_to_plot.append(b)
-            #             id_number.append(boxes.id[i])
-            #             # print("id ", boxes.id[i], "point ", point, "b ", b)
-
-        # Dibujar los puntos en la imagen del plano de planta
-        # cont = 0
-        for point, b, id_num in zip(points_to_plot, bb_to_plot, id_number):
+        # Dibujar los puntos en las imágenes
+        for point, b, id_c in zip(points_to_plot, bb_to_plot, id_color):
             # print("point", point, b)
-            # if boxes.id is not None:
-            color = map_number_to_color(id_num)
+            color = id_c
             # print(id_num, "->", color)
-            # cont += 1
             cv2.circle(
                 plano_planta, point, 5, color, -1
             )  # Dibujar un círculo rojo en la posición mapeada -> rojo (0, 0, 255)
@@ -135,7 +122,9 @@ for r in results:
 
     cv2.imshow(win_name, image)
 
-    escala = 0.5  # Se puede ajustar este valor para achicar la imagen
+    escala = (
+        0.5  # Se puede ajustar este valor para achicar o agrandar la imagen del palno
+    )
     plano_planta_show = cv2.resize(plano_planta, None, fx=escala, fy=escala)
     cv2.imshow("Plano de Planta", plano_planta_show)
 
