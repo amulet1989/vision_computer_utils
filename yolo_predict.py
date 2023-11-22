@@ -83,25 +83,39 @@ for r in results:
             # Mapear el punto en el plano de planta
             mapped_point, bb = bbox_to_planta(
                 box,
-                cam_id="camera62",  # camera62/camera72/camera52/camera122 "TRACK_1"  # "ENTRADA 1_ENTRADA_main"
+                cam_id="camera71",  # camera62/camera71/camera52/camera122 "TRACK_1"  # "ENTRADA 1_ENTRADA_main"
             )  # Función para mapear el punto a las coordenadas en el plano de planta
 
             # Comprobar si el punto mapeado está dentro de los límites de la imagen del plano de planta
             # estos es solo para fines de visualizacion para la funcion que dibuja los puntos
-            for point, b in zip(mapped_point, bb):
-                x, y = point
-                x1, y1 = b
-                if (
-                    0 <= x < plano_planta.shape[1]
-                    and 0 <= y < plano_planta.shape[0]
-                    and 0 <= x1 < image.shape[1]
-                    and 0 <= y1 < image.shape[0]
-                ):
-                    if boxes.id is not None:
-                        points_to_plot.append(point)
-                        bb_to_plot.append(b)
-                        id_number.append(boxes.id[i])
-                        # print("id ", boxes.id[i], "point ", point, "b ", b)
+            print(mapped_point)
+            x, y = mapped_point[0]
+            x1, y1 = bb[0]
+            if (
+                0 <= x < plano_planta.shape[1]
+                and 0 <= y < plano_planta.shape[0]
+                and 0 <= x1 < image.shape[1]
+                and 0 <= y1 < image.shape[0]
+            ):
+                if boxes.id is not None:
+                    points_to_plot.append([x, y])
+                    bb_to_plot.append([x1, y1])
+                    id_number.append(boxes.id[i])
+
+            # for point, b in zip(mapped_point, bb):
+            #     x, y = point
+            #     x1, y1 = b
+            #     if (
+            #         0 <= x < plano_planta.shape[1]
+            #         and 0 <= y < plano_planta.shape[0]
+            #         and 0 <= x1 < image.shape[1]
+            #         and 0 <= y1 < image.shape[0]
+            #     ):
+            #         if boxes.id is not None:
+            #             points_to_plot.append(point)
+            #             bb_to_plot.append(b)
+            #             id_number.append(boxes.id[i])
+            #             # print("id ", boxes.id[i], "point ", point, "b ", b)
 
         # Dibujar los puntos en la imagen del plano de planta
         # cont = 0
