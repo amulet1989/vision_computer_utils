@@ -21,7 +21,7 @@ model = YOLO("train_models/yolov8n_4cam.pt")  # train_models/yolov8n_4cam.pt
 
 # Create VideoCapture object
 INPUT_VIDEO = seleccionar_video()
-# INPUT_VIDEO = "rtsp://admin:2Mini001.@192.168.88.71"
+# INPUT_VIDEO = "rtsp://admin:2Mini001.@192.168.88.81/live1"
 
 plano_planta = cv2.imread(
     "Track_CF/CF_plano.jpg"
@@ -40,7 +40,7 @@ results = model.track(
     source=INPUT_VIDEO,
     stream=True,
     save=False,
-    conf=0.8,
+    conf=0.7,
     # iou=0.8,
     imgsz=704,
     # classes=classes,
@@ -83,9 +83,10 @@ for r in results:
             )
 
             # Mapear el punto en el plano de planta, acá se debe poner el id correcto de camara relativo al .yaml de configuracion
+            # TRACK_ENTRADA/TRACK_SALIDA/TRACK_1-3-4-5-6-7-8/TRACK_Nueva/TRACK_pozo_frio
             mapped_point, bb = bbox_to_planta(
                 box,
-                cam_id="camera52",  # camera62/camera71/camera52/camera122
+                cam_id="camera62",  # camera62/camera71/camera52/camera122 -
             )  # Función para mapear el punto a las coordenadas en el plano de planta
 
             # Comprobar si el punto mapeado está dentro de los límites de la imagen

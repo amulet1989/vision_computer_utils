@@ -5,13 +5,20 @@ from src.utils import seleccionar_imagen
 from src.mapping import bbox_to_planta
 
 # Cargar la imagen de vigilancia y el plano de planta
-image_path = "Track_CF/camera71.jpg"
+image_path = "Track_pilar/TRACK_pozo_frio_resized.jpg"
 imagen_vigilancia = cv2.imread(image_path)
-plano_planta = cv2.imread("Track_CF/CF_plano.jpg")
+plano_planta = cv2.imread("Track_pilar/planta_planta_Pilar_resized.jpg")
 
 # Puntos de interés manual (deben coincidir en la imagen y en el palno de planta)
-puntos_vigilancia = np.float32([[159, 560], [87, 160], [163, 80], [375, 148]])
-puntos_plano_planta = np.float32([[204, 466], [672, 582], [708, 686], [324, 670]])
+puntos_vigilancia = np.float32([[268, 326], [228, 34], [556, 94], [472, 398]])
+puntos_plano_planta = np.float32([[768, 119], [908, 99], [864, 299], [736, 235]])
+# Definir puntos a mapear, para validar la transformación.
+punto_imagen_vigilancia = [
+    [276, 454],
+    [204, 190],
+    [376, 38],
+    [488, 182],
+]  # [195, 256], [375, 244], [455, 476]
 
 # Hay dos formas de calcular la matriz de transformación:
 
@@ -22,8 +29,8 @@ matriz_transformacion = cv2.getPerspectiveTransform(
 print(f"matriz_transformacion {matriz_transformacion}")
 
 # Calcular la matriz de transformación (homografía) con cv2.findHomography
-# matriz_transformacion2, _ = cv2.findHomography(
-#    puntos_vigilancia, puntos_plano_planta, method=0
+# matriz_transformacion, _ = cv2.findHomography(
+#     puntos_vigilancia, puntos_plano_planta, method=1
 # )
 # 0 - a regular method using all the points, i.e., the least squares method
 # RANSAC - RANSAC-based robust method
@@ -62,14 +69,6 @@ imagen_vigilancia_mapeada = cv2.warpPerspective(
     (plano_planta.shape[1], plano_planta.shape[0]),
 )
 
-# Definir puntos a mapear, para validar la transformación.
-punto_imagen_vigilancia = [
-    [595, 424],
-    [375, 144],
-    [83, 156],
-    [59, 384],
-    [167, 560],
-]  # [195, 256], [375, 244], [455, 476]
 punto_imagen_vigilancia = np.array([punto_imagen_vigilancia], dtype=np.float32)
 # print("Punto-", punto_imagen_vigilancia)
 

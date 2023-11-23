@@ -7,6 +7,7 @@ import cv2
 
 # image_path = utils.seleccionar_imagen()
 # utils.resize_image(image_path, width=704, height=576)
+# utils.resize_image(image_path, escalar=True, escala=0.5)
 
 # Sacar un frame de un video y hacerle resize
 # video_path = utils.seleccionar_video()

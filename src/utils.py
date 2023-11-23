@@ -54,9 +54,13 @@ def seleccionar_directorio():
 
 
 # recibir una imagen y hacerle resize
-def resize_image(image_path, width=704, height=576):
+def resize_image(image_path, width=704, height=576, escalar=False, escala=0.5):
     image = cv2.imread(image_path)
-    resized_image = cv2.resize(image, (width, height))
+    if escalar:
+        resized_image = cv2.resize(image, None, fx=escala, fy=escala)
+    else:
+        resized_image = cv2.resize(image, (width, height))
+
     # guardar la imagen con un nuevo nombre
     new_image_name = os.path.splitext(image_path)[0] + "_resized.jpg"
     image_path = new_image_name
