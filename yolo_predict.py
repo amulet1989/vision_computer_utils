@@ -26,7 +26,7 @@ INPUT_VIDEO = seleccionar_video()
 # INPUT_VIDEO = "rtsp://admin:2Mini001.@192.168.88.81/live1"
 
 plano_planta = cv2.imread(
-    "Track_pilar/planta_planta_Pilar_resized.jpg"
+    "Track_CF/planta_planta_Pilar_resized.jpg"
 )  # Cargar la imagen del plano de planta -> Track_pilar/planta_planta_Pilar_resized.jpg - Track_CF/CF_plano.jpg
 
 # Read video
