@@ -18,7 +18,7 @@ def map_number_to_color(number):
 
 # Cargar modelo YOLO
 model = YOLO(
-    "train_models/yolov8m_tracking_pilar_11cam.pt"
+    "trained_models/yolov8m_tracking_pilar_11cam.pt"
 )  # train_models/yolov8n_4cam.pt
 
 # Create VideoCapture object
