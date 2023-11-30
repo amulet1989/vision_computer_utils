@@ -17,15 +17,17 @@ def map_number_to_color(number):
 
 
 # Cargar modelo YOLO
-model = YOLO("train_models/yolov8n_4cam.pt")  # train_models/yolov8n_4cam.pt
+model = YOLO(
+    "train_models/yolov8m_tracking_pilar_11cam.pt"
+)  # train_models/yolov8n_4cam.pt
 
 # Create VideoCapture object
 INPUT_VIDEO = seleccionar_video()
 # INPUT_VIDEO = "rtsp://admin:2Mini001.@192.168.88.81/live1"
 
 plano_planta = cv2.imread(
-    "Track_CF/CF_plano.jpg"
-)  # Cargar la imagen del plano de planta -> Track_pilar/planta_pilar_crop.jpg - Track_CF/CF_plano.jpg
+    "Track_pilar/planta_planta_Pilar_resized.jpg"
+)  # Cargar la imagen del plano de planta -> Track_pilar/planta_planta_Pilar_resized.jpg - Track_CF/CF_plano.jpg
 
 # Read video
 cap = cv2.VideoCapture(INPUT_VIDEO)
@@ -84,9 +86,10 @@ for r in results:
 
             # Mapear el punto en el plano de planta, acá se debe poner el id correcto de camara relativo al .yaml de configuracion
             # TRACK_ENTRADA/TRACK_SALIDA/TRACK_1-3-4-5-6-7-8/TRACK_Nueva/TRACK_pozo_frio
+            # print(box)
             mapped_point, bb = bbox_to_planta(
                 box,
-                cam_id="camera62",  # camera62/camera71/camera52/camera122 -
+                cam_id="TRACK_1",  # camera62/camera71/camera52/camera122 -
             )  # Función para mapear el punto a las coordenadas en el plano de planta
 
             # Comprobar si el punto mapeado está dentro de los límites de la imagen
@@ -111,7 +114,7 @@ for r in results:
     cv2.imshow(win_name, image)
 
     escala = (
-        0.5  # Se puede ajustar este valor para achicar o agrandar la imagen del palno
+        0.75  # Se puede ajustar este valor para achicar o agrandar la imagen del palno
     )
     plano_planta_show = cv2.resize(plano_planta, None, fx=escala, fy=escala)
     cv2.imshow("Plano de Planta", plano_planta_show)

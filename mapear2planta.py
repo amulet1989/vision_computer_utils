@@ -5,26 +5,33 @@ from src.utils import seleccionar_imagen
 from src.mapping import bbox_to_planta
 
 # Cargar la imagen de vigilancia y el plano de planta
-image_path = "Track_pilar/TRACK_pozo_frio_resized.jpg"
+image_path = (
+    "Track_pilar/OJO_DE_PEZ_resized.jpg"  # Track_pilar/TRACK_pozo_frio_resized.jpg
+)
 imagen_vigilancia = cv2.imread(image_path)
-plano_planta = cv2.imread("Track_pilar/planta_planta_Pilar_resized.jpg")
+plano_planta = cv2.imread(
+    "Track_pilar/planta_planta_Pilar.jpg"
+)  # Track_pilar/planta_planta_Pilar_resized.jpg - Track_CF/CF_plano.jpg
 
 # Puntos de interés manual (deben coincidir en la imagen y en el palno de planta)
-puntos_vigilancia = np.float32([[268, 326], [228, 34], [556, 94], [472, 398]])
-puntos_plano_planta = np.float32([[768, 119], [908, 99], [864, 299], [736, 235]])
+puntos_vigilancia = np.float32([[765, 478], [729, 774], [257, 710], [261, 506]])
+puntos_plano_planta = np.float32([[916, 145], [1820, 205], [1428, 1521], [868, 1361]])
 # Definir puntos a mapear, para validar la transformación.
 punto_imagen_vigilancia = [
-    [276, 454],
-    [204, 190],
-    [376, 38],
-    [488, 182],
+    [305, 694],
+    [653, 730],
+    [741, 726],
+    [713, 570],
+    [645, 474],
+    [417, 482],
+    [221, 574],
 ]  # [195, 256], [375, 244], [455, 476]
 
 # Hay dos formas de calcular la matriz de transformación:
 
 # Calcular la matriz de transformación (perspectiva)
 matriz_transformacion = cv2.getPerspectiveTransform(
-    puntos_vigilancia, puntos_plano_planta, solveMethod=1
+    puntos_vigilancia, puntos_plano_planta, solveMethod=0
 )  #'method == DECOMP_LU || method == DECOMP_SVD || method == DECOMP_EIG || method == DECOMP_CHOLESKY || method == DECOMP_QR'
 print(f"matriz_transformacion {matriz_transformacion}")
 
@@ -86,11 +93,11 @@ print(plano_x_y)
 # Imprimir los puntos en la imagen
 for i in range(len(imagen_x_y)):
     cv2.circle(imagen_vigilancia, (imagen_x_y[i]), 5, (0, 0, 255), -1)
-    cv2.circle(plano_planta, (plano_x_y[i]), 5, (0, 0, 255), -1)
+    cv2.circle(plano_planta, (plano_x_y[i]), 5, (0, 255, 0), -1)
     cv2.circle(imagen_vigilancia_mapeada, (plano_x_y[i]), 5, (0, 0, 255), -1)
 
 # Mostrar las imágenes
-escala = 0.75  # Puedes ajustar este valor según tus necesidades
+escala = 0.40  # Puedes ajustar este valor según tus necesidades
 plano_planta = cv2.resize(plano_planta, None, fx=escala, fy=escala)
 imagen_vigilancia_mapeada = cv2.resize(
     imagen_vigilancia_mapeada, None, fx=escala, fy=escala
