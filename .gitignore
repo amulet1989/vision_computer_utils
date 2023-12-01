@@ -180,7 +180,7 @@ images/
 videos/
 mapeos/
 Track_pilar/
-video_capturados/
+videos_capturados/
 train_models/
 #Track_CF/
 runs/
