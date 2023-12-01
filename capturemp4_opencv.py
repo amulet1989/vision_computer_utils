@@ -10,10 +10,10 @@ def start_opencv_pipelines(record_time, output_path):
 
     # Configurar las direcciones RTSP de las cámaras
     camera_addresses = [
-        "rtsp://admin:2Mini001.@192.168.88.131",
-        "rtsp://admin:2Mini001.@192.168.88.54",
-        "rtsp://admin:2Mini001.@192.168.88.81",
-        "rtsp://admin:2Mini001.@192.168.88.46",
+        "rtsp://admin:2Mini001.@192.168.88.131/live1",
+        "rtsp://admin:2Mini001.@192.168.88.54/live1",
+        "rtsp://admin:2Mini001.@192.168.88.81/live1",
+        "rtsp://admin:2Mini001.@192.168.88.46/live1",
     ]
 
     cap_objects = []
@@ -33,7 +33,7 @@ def start_opencv_pipelines(record_time, output_path):
         cv2.VideoWriter(
             f"{output_path}/camera{i + 1}_{current_datetime}.mp4",
             cv2.VideoWriter_fourcc(*"mp4v"),
-            30,
+            10,
             (
                 int(cap.get(3)),
                 int(cap.get(4)),
