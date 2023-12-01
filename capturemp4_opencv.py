@@ -16,24 +16,31 @@ def start_opencv_pipelines(record_time, output_path):
         "rtsp://admin:2Mini001.@192.168.88.46/live1",
     ]
 
-    cap_objects = []
+    cap_objects = []  # Lista para almacenar objetos de captura de video
 
+    # Iniciar la captura de video para cada cámara
     for i, address in enumerate(camera_addresses):
         cap = cv2.VideoCapture(address)
 
+        # Verificar si la captura de video se abrió correctamente
         if not cap.isOpened():
             print(f"No se pudo abrir la cámara {i + 1} en la dirección: {address}")
             continue
 
         cap_objects.append(cap)
 
+    # Crear directorio de salida si no existe
     os.makedirs(output_path, exist_ok=True)
 
+    # Iniciar la grabación para el tiempo especificado
+    start_time = time.time()
+
+    # Crear un archivo de video para cada cámara
     video_writers = [
         cv2.VideoWriter(
             f"{output_path}/camera{i + 1}_{current_datetime}.mp4",
             cv2.VideoWriter_fourcc(*"mp4v"),
-            5,
+            5.0,
             (
                 int(cap.get(3)),
                 int(cap.get(4)),
@@ -42,53 +49,28 @@ def start_opencv_pipelines(record_time, output_path):
         for i in range(len(cap_objects))
     ]
 
-    buffer_size = 5  # Tamaño del buffer para almacenar los últimos fotogramas
-    frame_buffers = [[] for _ in range(len(cap_objects))]
-
-    start_time = time.time()
-
     while (time.time() - start_time) < record_time:
         frames = []
 
+        # Capturar un frame de cada cámara
         for i, cap in enumerate(cap_objects):
             ret, frame = cap.read()
 
+            # Verificar si la captura fue exitosa
             if ret:
-                frames.append(
-                    (i, frame, time.time())
-                )  # Almacenar el número de cámara, el fotograma y el timestamp
+                frames.append(frame)
             else:
                 print(f"No se pudo capturar un frame de la cámara {i + 1}")
 
-        # Actualizar los buffers de fotogramas
-        for i, frame_info in enumerate(frames):
-            frame_buffers[i].append(frame_info)
+        # Escribir cada frame en el archivo de video correspondiente
+        for i, frame in enumerate(frames):
+            video_writers[i].write(frame)
 
-            # Mantener el tamaño del buffer
-            if len(frame_buffers[i]) > buffer_size:
-                frame_buffers[i] = frame_buffers[i][-buffer_size:]
-
-        # Sincronizar fotogramas y escribir en archivos de video
-        for i, buffer in enumerate(frame_buffers):
-            if (
-                len(buffer) == buffer_size
-            ):  # Solo sincronizar si hay suficientes fotogramas
-                timestamps = [frame_info[2] for frame_info in buffer]
-                min_timestamp = min(timestamps)
-
-                # Ajustar los fotogramas y escribir en el archivo de video
-                for frame_info in buffer:
-                    adjusted_frame = frame_info[1]
-                    timestamp_diff = frame_info[2] - min_timestamp
-                    # Aplicar ajuste de tiempo según la diferencia de timestamps
-                    # Aquí, puedes usar interpolación temporal u otros métodos según tus necesidades
-                    # adjusted_frame = adjust_frame_by_time(frame_info[1], timestamp_diff)
-
-                    video_writers[i].write(adjusted_frame)
-
+    # Liberar recursos y cerrar las capturas de video
     for cap in cap_objects:
         cap.release()
 
+    # Cerrar los archivos de video
     for writer in video_writers:
         writer.release()
 
