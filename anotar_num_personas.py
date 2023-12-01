@@ -1,15 +1,20 @@
 import cv2
 from src.utils import seleccionar_video
+from src.inferir_and_draw import draw_frame
 import os
 import numpy as np
 import argparse
 
+# roi-LQ122=350;81; 434;81; 417;480; 282;480
+# roi-LQ62=50;304;  200;304;  325;396;  325;590;  50;590
+# roi-SQ62=375;408; 480;290; 703;290; 703;590; 375;590
+
 all_vertices = {
-    "cam52": [[[365, 141], [440, 141], [465, 600], [320, 600]]],
-    "cam122": [[[350, 81], [434, 81], [417, 450], [282, 450]]],
+    "cam52": [[[365, 141], [440, 141], [465, 600], [282, 480]]],
+    "cam122": [[[350, 81], [434, 81], [417, 480], [282, 480]]],
     "cam62": [
-        [[0, 384], [295, 396], [295, 590], [0, 590]],
-        [[435, 408], [703, 363], [703, 590], [435, 590]],
+        [[50, 304], [200, 304], [325, 396], [325, 590], [50, 590]],
+        [[375, 408], [480, 290], [703, 290], [703, 590], [375, 590]],
     ],
     "cam71": [[[101, 171], [571, 453], [450, 564], [250, 564], [25, 246]]],
 }
@@ -35,6 +40,7 @@ def procesar_video(input_video_path, output_video_path, output_txt_path, cam="ca
 
             image2show = frame.copy()
             image2show = cv2.resize(image2show, (704, 576))
+            image2show = draw_frame(image2show)
             vertices = all_vertices[cam]
 
             # Mostrar el fotograma en una ventana emergente
