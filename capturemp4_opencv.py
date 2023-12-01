@@ -12,7 +12,7 @@ def start_opencv_pipelines(record_time, output_path):
     camera_addresses = [
         "rtsp://admin:2Mini001.@192.168.88.131",
         "rtsp://admin:2Mini001.@192.168.88.54",
-        "rtsp://admin:2Mini001.@192.168.88.73",
+        "rtsp://admin:2Mini001.@192.168.88.81",
         "rtsp://admin:2Mini001.@192.168.88.46",
     ]
 
