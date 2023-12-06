@@ -10,7 +10,9 @@ import argparse
 # roi-SQ62=375;408; 480;290; 703;290; 703;590; 375;590
 
 all_vertices = {
-    "cam52": [[[365, 141], [440, 141], [465, 600], [282, 480]]],
+    "cam52": [
+        [[365, 141], [440, 141], [465, 600], [320, 600]]
+    ],  # 365;141;440;141;465;600;320;600
     "cam122": [[[350, 81], [434, 81], [417, 480], [282, 480]]],
     "cam62": [
         [[50, 304], [200, 304], [325, 396], [325, 590], [50, 590]],
@@ -26,7 +28,7 @@ def procesar_video(input_video_path, output_video_path, output_txt_path, cam="ca
     # Definir el códec y el objeto VideoWriter
     fourcc = cv2.VideoWriter_fourcc(*"H264")
     out = cv2.VideoWriter(
-        output_video_path, fourcc, 5.0, (int(cap.get(3)), int(cap.get(4)))
+        output_video_path, fourcc, 10.0, (int(cap.get(3)), int(cap.get(4)))
     )
 
     frame_number = 0  # Inicializa el número de frame

@@ -107,7 +107,7 @@ def resize_video(video_path, width, height):
         ".mp4", "_resized.mp4"
     )  # Añade el sufijo "_resized" al nombre del archivo de salida
     out = cv2.VideoWriter(
-        output_path, fourcc, 5.0, (width, height)
+        output_path, fourcc, 10.0, (width, height)
     )  # 30 es la velocidad de fotogramas (puedes ajustarla)
 
     while cap.isOpened():
