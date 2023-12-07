@@ -5,26 +5,21 @@ from src.utils import seleccionar_imagen
 from src.mapping import bbox_to_planta
 
 # Cargar la imagen de vigilancia y el plano de planta
-image_path = (
-    "Track_pilar/OJO_DE_PEZ_resized.jpg"  # Track_pilar/TRACK_pozo_frio_resized.jpg
-)
+image_path = "Track_CF/camera71.jpg"  # Track_pilar/TRACK_pozo_frio_resized.jpg
 imagen_vigilancia = cv2.imread(image_path)
 plano_planta = cv2.imread(
-    "Track_pilar/planta_planta_Pilar.jpg"
+    "Track_CF/CF_plano.jpg"
 )  # Track_pilar/planta_planta_Pilar_resized.jpg - Track_CF/CF_plano.jpg
 
 # Puntos de interés manual (deben coincidir en la imagen y en el palno de planta)
-puntos_vigilancia = np.float32([[765, 478], [729, 774], [257, 710], [261, 506]])
-puntos_plano_planta = np.float32([[916, 145], [1820, 205], [1428, 1521], [868, 1361]])
+puntos_vigilancia = np.float32([[160, 552], [164, 84], [376, 148], [544, 400]])
+puntos_plano_planta = np.float32([[208, 466], [712, 670], [328, 670], [152, 582]])
 # Definir puntos a mapear, para validar la transformación.
 punto_imagen_vigilancia = [
-    [305, 694],
-    [653, 730],
-    [741, 726],
-    [713, 570],
-    [645, 474],
-    [417, 482],
-    [221, 574],
+    [376, 142],
+    [548, 446],
+    [152, 338],
+    [124, 178],
 ]  # [195, 256], [375, 244], [455, 476]
 
 # Hay dos formas de calcular la matriz de transformación:

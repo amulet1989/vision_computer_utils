@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 
 # Cargar la matrices de transformacion desde el archivo YAML
-with open("config/mapping_cfg.yaml", "r") as archivo_yaml:
+with open("config/mapping_cfg_cf.yaml", "r") as archivo_yaml:
     diccionario_cargado = yaml.load(archivo_yaml, Loader=yaml.FullLoader)
     # M = np.array(M)
 
@@ -42,3 +42,10 @@ def bbox_to_planta(bbox, cam_id):
 
     # print("Punto en plano", plano_x_y, "Punto camara", punto_bbox)
     return plano_x_y, punto_bbox
+
+
+def cam_point2planta(point, cam_id):
+    M = np.array(diccionario_cargado[cam_id])
+    point = np.array([point], dtype=np.float32)
+    punto_planta = cv2.perspectiveTransform(point, M)
+    return np.floor(np.array(punto_planta)).astype(np.int16)[0]

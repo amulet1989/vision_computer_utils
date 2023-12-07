@@ -57,6 +57,9 @@ def procesar_video(input_video_path, output_video_path, output_txt_path, cam="ca
 
             cv2.imshow("Fotograma", image2show)
 
+            # Salvar image2show como un archivo jpg
+            cv2.imwrite(f"frame{cam}.jpg", image2show)
+
             # Leer el número de personas en el frame desde el teclado
             num_personas = input(
                 f"Ingresa el número de personas en el frame {frame_number}: "
