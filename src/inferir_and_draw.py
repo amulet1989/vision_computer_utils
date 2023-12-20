@@ -15,7 +15,9 @@ def map_number_to_color(number):
 
 
 # Cargar modelo YOLO
-model = YOLO("trained_models/yolov8m_4cam.pt")  # train_models/yolov8n_4cam.pt
+model = YOLO(
+    "trained_models/yolov8m_cf_4cam_verano_pies_v2.pt"
+)  # train_models/yolov8n_4cam.pt
 
 
 def draw_frame(frame):
