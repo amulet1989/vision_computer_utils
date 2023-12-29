@@ -182,5 +182,5 @@ mapeos/
 Track_pilar/
 videos_capturados/
 train_models/
-#Track_CF/
+Track_CF/
 runs/
