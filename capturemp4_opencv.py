@@ -10,10 +10,17 @@ def start_opencv_pipelines(record_time, output_path):
 
     # Configurar las direcciones RTSP de las cámaras
     camera_addresses = [
-        "rtsp://admin:2Mini001.@192.168.88.131",  # live1
-        "rtsp://admin:2Mini001.@192.168.88.54",
-        "rtsp://admin:2Mini001.@192.168.88.81",
+        "rtsp://admin:2Mini001.@192.168.88.73",
         "rtsp://admin:2Mini001.@192.168.88.46",
+        "rtsp://admin:2Mini001.@192.168.88.59",
+        "rtsp://admin:2Mini001.@192.168.88.79",
+        "rtsp://admin:2Mini001.@192.168.88.70",
+        "rtsp://admin:2Mini001.@192.168.88.81",
+        "rtsp://admin:2Mini001.@192.168.88.49",
+        "rtsp://admin:2Mini001.@192.168.88.100",
+        "rtsp://admin:2Mini001.@192.168.88.69",
+        "rtsp://admin:2Mini001.@192.168.88.131",
+        "rtsp://admin:2Mini001.@192.168.88.54",
     ]
 
     cap_objects = []  # Lista para almacenar objetos de captura de video
