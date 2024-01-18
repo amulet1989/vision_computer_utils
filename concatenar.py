@@ -1,6 +1,7 @@
 import os
 import subprocess
 import argparse
+from moviepy.editor import VideoFileClip, concatenate_videoclips
 
 
 def concatenar_videos_cronologicamente(directorio_base, directorio_salida):
@@ -26,20 +27,31 @@ def concatenar_videos_cronologicamente(directorio_base, directorio_salida):
         ruta_video_salida = os.path.join(directorio_salida, f"{camara}.mp4")
 
         # Construir la lista de rutas de los videos a concatenar
-        rutas_videos = [os.path.join(carpeta_camara, video) for video in videos]
+        # rutas_videos = [os.path.join(carpeta_camara, video) for video in videos]
 
-        # Usar ffmpeg para concatenar los videos en orden cronológico
-        comando_ffmpeg = [
-            "ffmpeg",
-            "-i",
-            f'concat:{"|".join(rutas_videos)}',
-            "-c",
-            "copy",
-            ruta_video_salida,
+        # Crear una lista de objetos VideoFileClip
+        video_clips = [
+            VideoFileClip(os.path.join(carpeta_camara, video)) for video in videos
         ]
 
+        # Concatenar los clips de video
+        video_final = concatenate_videoclips(video_clips, method="compose")
+
+        # Guardar el video final
+        video_final.write_videofile(ruta_video_salida)
+
+        # Usar ffmpeg para concatenar los videos en orden cronológico
+        # comando_ffmpeg = [
+        #     "ffmpeg",
+        #     "-i",
+        #     f'concat:{"|".join(rutas_videos)}',
+        #     "-c",
+        #     "copy",
+        #     ruta_video_salida,
+        # ]
+
         # Ejecutar el comando ffmpeg
-        subprocess.run(comando_ffmpeg)
+        # subprocess.run(comando_ffmpeg)
 
     print("Concatenación completada")
 
