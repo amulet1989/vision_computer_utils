@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 
 # Cargar la matrices de transformacion desde el archivo YAML
-with open("config/mapping_cfg_cf.yaml", "r") as archivo_yaml:
+with open("config/mapping_640.yaml", "r") as archivo_yaml:
     diccionario_cargado = yaml.load(archivo_yaml, Loader=yaml.FullLoader)
     # M = np.array(M)
 

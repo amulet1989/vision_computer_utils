@@ -3,25 +3,61 @@ import time
 import argparse
 import os
 
+cam = [
+    [
+        246,
+        247,
+        248,
+        249,
+        250,
+    ],
+    [122, 71, 62, 52],
+]
 
-def start_opencv_pipelines(record_time, output_path):
+camera_addresses = [
+    [
+        # Hikvision #
+        ##############
+        # Secundario #
+        ##############
+        # "rtsp://admin:2Mini001.@181.164.198.186:9558/h265/ch1/sub/av_stream",  # 246
+        # "rtsp://admin:2Mini001.@181.164.198.186:9559/h265/ch1/sub/av_stream",  # 247
+        # "rtsp://admin:2Mini001.@181.164.198.186:9560/h265/ch1/sub/av_stream",  # 248
+        # "rtsp://admin:2Mini001.@181.164.198.186:9561/h265/ch1/sub/av_stream",  # 249
+        # "rtsp://admin:2Mini001.@181.164.198.186:9562/h265/ch1/sub/av_stream",  # 250
+        ##############
+        # # Primario #
+        ##############
+        "rtsp://admin:2Mini001.@181.164.198.186:9558",  # 246
+        "rtsp://admin:2Mini001.@181.164.198.186:9559",  # 247
+        "rtsp://admin:2Mini001.@181.164.198.186:9560",  # 248
+        "rtsp://admin:2Mini001.@181.164.198.186:9561",  # 249
+        "rtsp://admin:2Mini001.@181.164.198.186:9562",  # 250
+    ],
+    [
+        # Dahua #
+        ##############
+        # Secundario #
+        ##############
+        # "rtsp://admin:2Mini001.@181.164.198.186:9557/live1",  # 122
+        # "rtsp://admin:2Mini001.@181.164.198.186:9556/live1",  # 71
+        # "rtsp://admin:2Mini001.@181.164.198.186:9555/live1",  # 62
+        # "rtsp://admin:2Mini001.@181.164.198.186:9554/live1",  # 52
+        ##############
+        # # Primario #
+        ##############
+        "rtsp://admin:2Mini001.@181.164.198.186:9557",  # 122
+        "rtsp://admin:2Mini001.@181.164.198.186:9556",  # 71
+        "rtsp://admin:2Mini001.@181.164.198.186:9555",  # 62
+        "rtsp://admin:2Mini001.@181.164.198.186:9554",  # 52
+    ],
+]
+# cam = [122]
+
+
+def start_opencv_pipelines(camera_addresses, cam, record_time, output_path):
     # Obtener la fecha y hora actual para generar nombres de archivo
     current_datetime = time.strftime("%Y%m%d_%H%M%S")
-
-    # Configurar las direcciones RTSP de las cámaras
-    camera_addresses = [
-        "rtsp://admin:2Mini001.@192.168.88.73",
-        "rtsp://admin:2Mini001.@192.168.88.46",
-        "rtsp://admin:2Mini001.@192.168.88.59",
-        "rtsp://admin:2Mini001.@192.168.88.79",
-        "rtsp://admin:2Mini001.@192.168.88.70",
-        "rtsp://admin:2Mini001.@192.168.88.81",
-        "rtsp://admin:2Mini001.@192.168.88.49",
-        "rtsp://admin:2Mini001.@192.168.88.100",
-        "rtsp://admin:2Mini001.@192.168.88.69",
-        "rtsp://admin:2Mini001.@192.168.88.131",
-        "rtsp://admin:2Mini001.@192.168.88.54",
-    ]
 
     cap_objects = []  # Lista para almacenar objetos de captura de video
 
@@ -31,7 +67,7 @@ def start_opencv_pipelines(record_time, output_path):
 
         # Verificar si la captura de video se abrió correctamente
         if not cap.isOpened():
-            print(f"No se pudo abrir la cámara {i + 1} en la dirección: {address}")
+            print(f"No se pudo abrir la cámara {cam[i]} en la dirección: {address}")
             continue
 
         cap_objects.append(cap)
@@ -45,9 +81,9 @@ def start_opencv_pipelines(record_time, output_path):
     # Crear un archivo de video para cada cámara
     video_writers = [
         cv2.VideoWriter(
-            f"{output_path}/camera{i + 1}_{current_datetime}.mp4",
+            f"{output_path}/camera{cam[i]}_{current_datetime}.mp4",
             cv2.VideoWriter_fourcc(*"mp4v"),
-            10.0,
+            20.0,
             (
                 int(cap.get(3)),
                 int(cap.get(4)),
@@ -67,7 +103,7 @@ def start_opencv_pipelines(record_time, output_path):
             if ret:
                 frames.append(frame)
             else:
-                print(f"No se pudo capturar un frame de la cámara {i + 1}")
+                print(f"No se pudo capturar un frame de la cámara {cam[i]}")
 
         # Escribir cada frame en el archivo de video correspondiente
         for i, frame in enumerate(frames):
@@ -87,7 +123,7 @@ if __name__ == "__main__":
         description="Iniciar pipelines OpenCV con opciones configurables."
     )
     parser.add_argument(
-        "--record-time", type=int, default=120, help="Tiempo de grabación en segundos"
+        "--record-time", type=int, default=10, help="Tiempo de grabación en segundos"
     )
     parser.add_argument(
         "--output-path",
@@ -97,4 +133,8 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    start_opencv_pipelines(args.record_time, args.output_path)
+    for i in range(len(camera_addresses)):
+        print(camera_addresses[i], cam[i])
+        start_opencv_pipelines(
+            camera_addresses[i], cam[i], args.record_time, args.output_path
+        )

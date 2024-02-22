@@ -96,7 +96,7 @@ def get_frame_from_video(video_path, frame_number, width, height):
 
 
 # hacer resize de un video y guardarlo con el sufijo resized
-def resize_video(video_path, width, height):
+def resize_video(video_path, width, height, fps=20.0):
     cap = cv2.VideoCapture(video_path)
 
     # Definir el códec y el objeto VideoWriter
@@ -107,7 +107,7 @@ def resize_video(video_path, width, height):
         ".mp4", "_resized.mp4"
     )  # Añade el sufijo "_resized" al nombre del archivo de salida
     out = cv2.VideoWriter(
-        output_path, fourcc, 10.0, (width, height)
+        output_path, fourcc, fps, (width, height)
     )  # 30 es la velocidad de fotogramas (puedes ajustarla)
 
     while cap.isOpened():

@@ -18,7 +18,7 @@ def map_number_to_color(number):
 
 # Cargar modelo YOLO
 model = YOLO(
-    "trained_models/yolov8m_tracking_pilar_11cam.pt"
+    "trained_models/yolov8m_cf_4cam_verano_pies_v2.pt"
 )  # train_models/yolov8n_4cam.pt
 
 # Create VideoCapture object
@@ -26,7 +26,7 @@ INPUT_VIDEO = seleccionar_video()
 # INPUT_VIDEO = "rtsp://admin:2Mini001.@192.168.88.81/live1"
 
 plano_planta = cv2.imread(
-    "Track_CF/planta_planta_Pilar_resized.jpg"
+    "Track_CF_9cam/Planta_CF_9cam.jpg"
 )  # Cargar la imagen del plano de planta -> Track_pilar/planta_planta_Pilar_resized.jpg - Track_CF/CF_plano.jpg
 
 # Read video
@@ -35,7 +35,7 @@ win_name = "Camera Preview"
 cv2.namedWindow(win_name, cv2.WINDOW_NORMAL)
 
 # Ajustar el tamaño de la ventana de salida del video
-cv2.resizeWindow(win_name, 704, 576)
+cv2.resizeWindow(win_name, 640, 360)
 
 # classes = 0
 results = model.track(
@@ -44,7 +44,7 @@ results = model.track(
     save=False,
     conf=0.7,
     # iou=0.8,
-    imgsz=704,
+    imgsz=640,  # 640 1280
     # classes=classes,
 )  # generator of Results objects
 
@@ -89,7 +89,7 @@ for r in results:
             # print(box)
             mapped_point, bb = bbox_to_planta(
                 box,
-                cam_id="TRACK_1",  # camera62/camera71/camera52/camera122 -
+                cam_id="camera246",  # camera62/camera71/camera52/camera122 -
             )  # Función para mapear el punto a las coordenadas en el plano de planta
 
             # Comprobar si el punto mapeado está dentro de los límites de la imagen
