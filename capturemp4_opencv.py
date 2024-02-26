@@ -123,7 +123,7 @@ if __name__ == "__main__":
         description="Iniciar pipelines OpenCV con opciones configurables."
     )
     parser.add_argument(
-        "--record-time", type=int, default=10, help="Tiempo de grabación en segundos"
+        "--record-time", type=int, default=30, help="Tiempo de grabación en segundos"
     )
     parser.add_argument(
         "--output-path",
