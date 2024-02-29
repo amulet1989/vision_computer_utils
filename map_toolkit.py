@@ -119,7 +119,38 @@ def onclick(event):
             ax2.text(event.xdata, event.ydata, str(len(puntos_pruebas)), color="green")
             if len(puntos_pruebas) > 1:
                 ax2.plot(*zip(*puntos_pruebas), "g-")
-        fig.canvas.draw()
+
+    # ...
+    elif event.button == 3 and registrando:
+        # Si se hace clic con el botón derecho y se está registrando, elimina el último vértice
+        if event.inaxes == ax1 and puntos_planta:
+            puntos_planta.pop()
+            ax1.clear()
+            ax1.imshow(imagen1)
+            for i, punto in enumerate(puntos_planta, start=1):
+                ax1.text(punto[0], punto[1], str(i), color="red")
+            if len(puntos_planta) > 1:
+                ax1.plot(*zip(*puntos_planta), "r-")
+
+        elif event.inaxes == ax2:
+            if prueba and puntos_pruebas:
+                puntos_pruebas.pop()
+                ax2.clear()
+                ax2.imshow(imagen2)
+                for i, punto in enumerate(puntos_pruebas, start=1):
+                    ax2.text(punto[0], punto[1], str(i), color="green")
+                if len(puntos_pruebas) > 1:
+                    ax2.plot(*zip(*puntos_pruebas), "g-")
+            elif not prueba and puntos_cam:
+                puntos_cam.pop()
+                ax2.clear()
+                ax2.imshow(imagen2)
+                for i, punto in enumerate(puntos_cam, start=1):
+                    ax2.text(punto[0], punto[1], str(i), color="red")
+                if len(puntos_cam) > 1:
+                    ax2.plot(*zip(*puntos_cam), "r-")
+
+    fig.canvas.draw()
 
 
 ###############################################
@@ -132,6 +163,7 @@ def onkeypress(event):
     m -> mapear los puntos
     b -> borrar los puntos y los poligonos en el axi2
     v -> borrar los puntos y los spoliogonos en el axe1
+    p -> imprimir los poligonos en consola
     q -> salir del programa
     """
     global registrando, prueba, puntos_pruebas, puntos_cam, puntos_planta
@@ -163,11 +195,22 @@ def onkeypress(event):
         ax1.imshow(imagen1, aspect="equal")
         fig.canvas.draw()
         print("Puntos en planta borrados")
+    if event.key == "p":
+        # Si se presiona 'p', se imprimen los poligonos en consola redondeados a enteros
+        print("poligono imagen 1:", np.floor(np.array(puntos_planta)).astype(np.int16))
+        print(
+            "poligono imagen 2 rojo:", np.floor(np.array(puntos_cam)).astype(np.int16)
+        )
+        print(
+            "poligono_imagen 2 verde:",
+            np.floor(np.array(puntos_pruebas)).astype(np.int16),
+        )
     if event.key == "q":
         # Si se presiona 'q', se cierra el programa
-        print("puntos_planta:", puntos_planta)
-        print("puntos_cam:", puntos_cam)
-        print("puntos_pruebas:", puntos_pruebas)
+        # Se imprimen los puntos de mapeo en la consola redondeados a enteros
+        print("puntos_planta:", np.floor(np.array(puntos_planta)).astype(np.int16))
+        print("puntos_cam:", np.floor(np.array(puntos_cam)).astype(np.int16))
+        print("puntos_pruebas:", np.floor(np.array(puntos_pruebas)).astype(np.int16))
         plt.close()
         exit()
 

@@ -1,9 +1,9 @@
 from src import utils
 import cv2
 
-images_path = utils.seleccionar_directorio()
-utils.resize_images_in_directory(images_path, width=640, height=480)
-print("se preprocesaron las imagenes")
+# images_path = utils.seleccionar_directorio()
+# utils.resize_images_in_directory(images_path, width=640, height=480)
+# print("se preprocesaron las imagenes")
 
 # image_path = utils.seleccionar_imagen()
 # utils.resize_image(image_path, width=704, height=576)
@@ -16,4 +16,4 @@ print("se preprocesaron las imagenes")
 # # guardar la imagen en la misma carpeta del video
 # cv2.imwrite(f"{video_path}_1280x720.jpg", image_frame)
 
-# utils.resize_video(utils.seleccionar_video(), width=640, height=360, fps=20.0)
+utils.resize_video(utils.seleccionar_video(), width=640, height=480, fps=20.0)
