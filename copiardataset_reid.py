@@ -75,11 +75,11 @@ def main():
         description="Procesar estructura de directorios de videos."
     )
     parser.add_argument(
-        "directorio_base",
+        "--directorio_base",
         help="Ruta al directorio base de la estructura de directorios de videos.",
     )
     parser.add_argument(
-        "directorio_salida",
+        "--directorio_salida",
         help="Ruta al directorio de salida para la nueva estructura de directorios.",
     )
 
