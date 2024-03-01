@@ -2,77 +2,97 @@ import os
 
 # import subprocess
 import argparse
-from moviepy.editor import VideoFileClip, concatenate_videoclips
+from tqdm import tqdm
+import cv2
 
 
-def concatenar_videos_cronologicamente(directorio_base, directorio_salida):
-    # Obtener la lista de carpetas de cámaras en el directorio base
+def concatenar_carpeta(camera_folder, output_folder):
+    # Define the path to the camera folder
+    # camera_folder = "/media/minigo/DATA/Alexander_frigate/reformado/2024-01-18/c11"
+
+    # Get the list of all videos in the folder
+    video_files = os.listdir(camera_folder)
+
+    # Sort the videos by timestamp
+    # video_files.sort(key=lambda x: get_timestamp(x))
+    video_files.sort()
+
+    # for file in video_files:
+    #    print(os.path.basename(file))
+
+    # Create the output video file
+    output_file_path = os.path.join(
+        output_folder, f"{os.path.basename(camera_folder)}.mp4"
+    )
+    output_video = cv2.VideoWriter(
+        output_file_path, cv2.VideoWriter_fourcc(*"mp4v"), 10, (1920, 1080)
+    )
+
+    # Iterate over the videos and concatenate them
+    for video_file in video_files:
+        # Get the video timestamp
+        # timestamp = get_timestamp(video_file)
+
+        # Load the video
+        video = cv2.VideoCapture(os.path.join(camera_folder, video_file))
+
+        # Check if the video is readable
+        if not video.isOpened():
+            continue
+
+        # Read the video frames
+        while True:
+            # Read the next frame
+            success, frame = video.read()
+
+            # Check if the end of the video has been reached
+            if not success:
+                break
+
+            # Write the frame to the output video
+            output_video.write(frame)
+
+    # Release the output video
+    output_video.release()
+
+    # Close the video files
+    for video_file in video_files:
+        video = cv2.VideoCapture(os.path.join(camera_folder, video_file))
+        video.release()
+
+
+# Obtener la lista de carpetas de cámaras en el directorio base
+def main():
+
+    parser = argparse.ArgumentParser(
+        description="Pipeline para procesar videos y detección de objetos"
+    )
+    parser.add_argument(
+        "--dir_base",
+        default="/media/minigo/DATA/Alexander_frigate/reformado/2024-01-18",
+        type=str,
+        help="Ruta al archivo de video",
+    )
+    parser.add_argument(
+        "--output_dir",
+        default="/media/minigo/DATA/Alexander_frigate/concatenado",
+        type=str,
+        help="Ruta al directorio de imágenes",
+    )
+    args = parser.parse_args()
+
     carpetas_camaras = [
         d
-        for d in os.listdir(directorio_base)
-        if os.path.isdir(os.path.join(directorio_base, d))
+        for d in os.listdir(args.dir_base)
+        if os.path.isdir(os.path.join(args.dir_base, d))
     ]
 
     # Iterar sobre las carpetas de cámaras
-    for camara in carpetas_camaras:
-        # Construir la ruta de la carpeta de la cámara en el directorio base
-        carpeta_camara = os.path.join(directorio_base, camara)
+    for camara in tqdm(carpetas_camaras, desc="Concatenando cámaras"):
+        # print(f"concatenando {camara}")
+        concatenar_carpeta(os.path.join(args.dir_base, camara), args.output_dir)
 
-        # Obtener la lista de archivos de video en la carpeta de la cámara
-        videos = [f for f in os.listdir(carpeta_camara) if f.endswith(".mp4")]
-
-        # Ordenar los videos por nombre para garantizar el orden cronológico
-        videos.sort()
-
-        # Construir la ruta del archivo de salida
-        ruta_video_salida = os.path.join(directorio_salida, f"{camara}.mp4")
-
-        # Construir la lista de rutas de los videos a concatenar
-        # rutas_videos = [os.path.join(carpeta_camara, video) for video in videos]
-
-        # Crear una lista de objetos VideoFileClip
-        video_clips = [
-            VideoFileClip(os.path.join(carpeta_camara, video)) for video in videos
-        ]
-
-        # Concatenar los clips de video
-        video_final = concatenate_videoclips(video_clips, method="compose")
-
-        # Guardar el video final
-        video_final.write_videofile(ruta_video_salida)
-
-        # Usar ffmpeg para concatenar los videos en orden cronológico
-        # comando_ffmpeg = [
-        #     "ffmpeg",
-        #     "-i",
-        #     f'concat:{"|".join(rutas_videos)}',
-        #     "-c",
-        #     "copy",
-        #     ruta_video_salida,
-        # ]
-
-        # Ejecutar el comando ffmpeg
-        # subprocess.run(comando_ffmpeg)
-
-    print("Concatenación completada")
-
-
-def main():
-    parser = argparse.ArgumentParser(
-        description="Concatenar cronológicamente clips de video en cada carpeta de cámara."
-    )
-    parser.add_argument(
-        "directorio_base",
-        help="Ruta al directorio base de la estructura de directorios de videos.",
-    )
-    parser.add_argument(
-        "directorio_salida",
-        help="Ruta al directorio de salida para los archivos de video concatenados.",
-    )
-
-    args = parser.parse_args()
-
-    concatenar_videos_cronologicamente(args.directorio_base, args.directorio_salida)
+    print("concatenacion terminada")
 
 
 if __name__ == "__main__":
