@@ -15,12 +15,7 @@ def cargar_imagen(especificacion):
 
     file_path = filedialog.askopenfilename(
         title=f"Seleccionar una imagen de {especificacion}",
-        filetypes=[
-            (
-                "Archivos de imagen",
-                "*.jpg",
-            )
-        ],
+        filetypes=[("Archivos de imagen", ["*.jpg", "*.jpeg"])],
     )
 
     if file_path:
@@ -163,7 +158,7 @@ def onkeypress(event):
     m -> mapear los puntos
     b -> borrar los puntos y los poligonos en el axi2
     v -> borrar los puntos y los spoliogonos en el axe1
-    p -> imprimir los poligonos en consola
+    i -> imprimir los poligonos en consola
     q -> salir del programa
     """
     global registrando, prueba, puntos_pruebas, puntos_cam, puntos_planta
@@ -195,16 +190,37 @@ def onkeypress(event):
         ax1.imshow(imagen1, aspect="equal")
         fig.canvas.draw()
         print("Puntos en planta borrados")
-    if event.key == "p":
-        # Si se presiona 'p', se imprimen los poligonos en consola redondeados a enteros
-        print("poligono imagen 1:", np.floor(np.array(puntos_planta)).astype(np.int16))
-        print(
-            "poligono imagen 2 rojo:", np.floor(np.array(puntos_cam)).astype(np.int16)
-        )
-        print(
-            "poligono_imagen 2 verde:",
-            np.floor(np.array(puntos_pruebas)).astype(np.int16),
-        )
+    if event.key == "i":
+        # Si se presiona 'i', se imprimen los poligonos en consola redondeados a enteros
+
+        # Polígonos redondeados a enteros
+        poligono_planta = np.floor(np.array(puntos_planta)).astype(np.int16)
+        poligono_cam = np.floor(np.array(puntos_cam)).astype(np.int16)
+        poligono_pruebas = np.floor(np.array(puntos_pruebas)).astype(np.int16)
+
+        # Formatear los polígonos en una sola línea
+        formato_planta = ";".join(map(str, poligono_planta.flatten()))
+        formato_cam = ";".join(map(str, poligono_cam.flatten()))
+        formato_pruebas = ";".join(map(str, poligono_pruebas.flatten()))
+
+        # Imprimir los polígonos en consola
+        print("poligono imagen 1:", str(poligono_planta.tolist()))
+        print("poligono imagen 2 rojo:", str(poligono_cam.tolist()))
+        print("poligono_imagen 2 verde:", str(poligono_pruebas.tolist()))
+
+        # Guardar la salida en un archivo de texto
+        with open(image_path.replace(".jpg", ".txt"), "w") as archivo:
+            archivo.write(f"Polígono imagen 1: {str(poligono_planta.tolist())}\n")
+            archivo.write(f"{formato_planta}\n")
+            archivo.write(f"Polígono imagen 2 rojo: {str(poligono_cam.tolist())}\n")
+            archivo.write(f"{formato_cam}\n")
+            archivo.write(
+                f"Polígono imagen 2 verde: {str(poligono_pruebas.tolist())}\n"
+            )
+            archivo.write(f"{formato_pruebas}\n")
+
+            print(f"Los polígonos han sido guardados en {archivo}")
+
     if event.key == "q":
         # Si se presiona 'q', se cierra el programa
         # Se imprimen los puntos de mapeo en la consola redondeados a enteros
