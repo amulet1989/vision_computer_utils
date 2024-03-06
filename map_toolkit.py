@@ -4,6 +4,19 @@ import cv2
 import yaml
 import tkinter as tk
 from tkinter import filedialog
+import os
+
+# Instrucciones:
+
+# a -> cambiar el estado de registro
+# p -> cambiar el estado de registro de puntos de prueba
+# m -> mapear los puntos
+# b -> borrar los puntos y los poligonos en el ax2
+# v -> borrar los puntos y los spoliogonos en el ax1
+# i -> imprimir los poligonos en consola
+# t -> obtener M del archivo yaml de configuración y mapear puntos de prueba
+# c -> cargar poligono del archivo txt
+# q -> salir del programa
 
 
 ###############################
@@ -69,11 +82,49 @@ def mapping_opencv_prueba(puntos_prueba, M):
 
     # Extrare las coordenadas en el plano de planta en la forma (x, y)
     plano_x_y = [x for x in np.array(punto_plano_planta[0][:][:], dtype=np.int16)]
-    print(plano_x_y)
-
+    print("Puntos del plano:", np.floor(np.array(plano_x_y)).astype(np.int16))
+    print("Puntos de la camara:", np.floor(np.array(puntos_prueba)).astype(np.int16))
+    for i, punto in enumerate(plano_x_y, start=1):
+        ax1.text(punto[0], punto[1], str(i), color="green")
     ax1.plot(*zip(*plano_x_y), "g-")
     fig.canvas.draw()
 
+
+#######################################
+# Funciones para visualizar poligonos #
+#######################################
+def cargar_poligonos(nombre_archivo):
+    with open(nombre_archivo, "r") as archivo:
+        contenido = archivo.readlines()
+
+    poligonos = []
+
+    for linea in contenido:
+        if ";" in linea:
+            # Si la línea contiene punto y coma, probablemente sea una línea de polígono
+            puntos_str = linea.strip()
+
+            if puntos_str:
+                puntos = [int(p) for p in puntos_str.split(";")]
+                poligonos.append(puntos)
+
+    return poligonos
+
+
+def mostrar_imagen_con_poligonos(poligonos):
+    # plt.imshow(imagen)
+
+    for i, poligono in enumerate(poligonos, start=1):
+        if poligono:
+            x = poligono[0::2]
+            y = poligono[1::2]
+            ax2.plot(x + [x[0]], y + [y[0]], label=f"Polígono {i}")
+    fig.canvas.draw()
+
+
+##############
+# Aplicacion #
+##############
 
 # Creamos una figura con dos ejes
 fig, (ax1, ax2) = plt.subplots(1, 2)
@@ -156,9 +207,11 @@ def onkeypress(event):
     a -> cambiar el estado de registro
     p -> cambiar el estado de registro de puntos de prueba
     m -> mapear los puntos
-    b -> borrar los puntos y los poligonos en el axi2
-    v -> borrar los puntos y los spoliogonos en el axe1
+    b -> borrar los puntos y los poligonos en el ax2
+    v -> borrar los puntos y los spoliogonos en el ax1
     i -> imprimir los poligonos en consola
+    t -> obtener M del archivo yaml de configuración y mapear puntos de prueba
+    c -> cargar poligono del archivo txt
     q -> salir del programa
     """
     global registrando, prueba, puntos_pruebas, puntos_cam, puntos_planta
@@ -220,13 +273,32 @@ def onkeypress(event):
             archivo.write(f"{formato_pruebas}\n")
 
             print(f"Los polígonos han sido guardados en {archivo}")
+    if event.key == "t":
+        # Si se presiona 't', se lee el archivo de configuración y se mapean los puntos de prueba
+        cam_id = image_path.split("/")[-1].replace(".jpg", "")
+        with open(image_path.replace(".jpg", ".yaml"), "r") as archivo_yaml:
+            diccionario_cargado = yaml.load(archivo_yaml, Loader=yaml.FullLoader)
+            M = np.array(diccionario_cargado[cam_id])
+            mapping_opencv_prueba(puntos_pruebas, M)
+            print("Puntos mapeados")
+    if event.key == "c":
+        # Si se presiona 'c', se carga un polígono desde un archivo txt
+        if image_path:
+            # Extraer el nombre del archivo y cargar el archivo de texto
+            nombre_archivo = image_path[:-4] + ".txt"
+
+            if not os.path.exists(nombre_archivo):
+                print("El archivo de texto no existe.")
+            else:
+                poligonos = cargar_poligonos(nombre_archivo)
+                mostrar_imagen_con_poligonos(poligonos)
 
     if event.key == "q":
         # Si se presiona 'q', se cierra el programa
         # Se imprimen los puntos de mapeo en la consola redondeados a enteros
-        print("puntos_planta:", np.floor(np.array(puntos_planta)).astype(np.int16))
-        print("puntos_cam:", np.floor(np.array(puntos_cam)).astype(np.int16))
-        print("puntos_pruebas:", np.floor(np.array(puntos_pruebas)).astype(np.int16))
+        # print("puntos_planta:", np.floor(np.array(puntos_planta)).astype(np.int16))
+        # print("puntos_cam:", np.floor(np.array(puntos_cam)).astype(np.int16))
+        # print("puntos_pruebas:", np.floor(np.array(puntos_pruebas)).astype(np.int16))
         plt.close()
         exit()
 
