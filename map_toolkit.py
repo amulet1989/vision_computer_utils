@@ -166,7 +166,6 @@ def onclick(event):
             if len(puntos_pruebas) > 1:
                 ax2.plot(*zip(*puntos_pruebas), "g-")
 
-    # ...
     elif event.button == 3 and registrando:
         # Si se hace clic con el botón derecho y se está registrando, elimina el último vértice
         if event.inaxes == ax1 and puntos_planta:

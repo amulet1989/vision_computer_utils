@@ -187,4 +187,5 @@ videos_capturados/
 train_models/
 Track_CF/
 Track_CF_9cam/
+trained_models/
 runs/

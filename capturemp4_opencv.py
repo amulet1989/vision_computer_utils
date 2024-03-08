@@ -14,6 +14,8 @@ cam = [
     [122, 71, 62, 52],
 ]
 
+cam = [["65_640x480"], ["65_1280x720"]]
+
 camera_addresses = [
     [
         # Hikvision #
@@ -28,11 +30,12 @@ camera_addresses = [
         ##############
         # # Primario #
         ##############
-        "rtsp://admin:2Mini001.@181.164.198.186:9558",  # 246
-        "rtsp://admin:2Mini001.@181.164.198.186:9559",  # 247
-        "rtsp://admin:2Mini001.@181.164.198.186:9560",  # 248
-        "rtsp://admin:2Mini001.@181.164.198.186:9561",  # 249
-        "rtsp://admin:2Mini001.@181.164.198.186:9562",  # 250
+        # "rtsp://admin:2Mini001.@181.164.198.186:9558",  # 246
+        # "rtsp://admin:2Mini001.@181.164.198.186:9559",  # 247
+        # "rtsp://admin:2Mini001.@181.164.198.186:9560",  # 248
+        # "rtsp://admin:2Mini001.@181.164.198.186:9561",  # 249
+        # "rtsp://admin:2Mini001.@181.164.198.186:9562",  # 250
+        "rtsp://admin:2Mini001.@181.164.198.186:6554/live1"  # 65
     ],
     [
         # Dahua #
@@ -43,13 +46,15 @@ camera_addresses = [
         # "rtsp://admin:2Mini001.@181.164.198.186:9556/live1",  # 71
         # "rtsp://admin:2Mini001.@181.164.198.186:9555/live1",  # 62
         # "rtsp://admin:2Mini001.@181.164.198.186:9554/live1",  # 52
+        # "rtsp://admin:2Mini001.@181.164.198.186:6554/live1",  # 65 linea de caja
         ##############
         # # Primario #
         ##############
-        "rtsp://admin:2Mini001.@181.164.198.186:9557",  # 122
-        "rtsp://admin:2Mini001.@181.164.198.186:9556",  # 71
-        "rtsp://admin:2Mini001.@181.164.198.186:9555",  # 62
-        "rtsp://admin:2Mini001.@181.164.198.186:9554",  # 52
+        # "rtsp://admin:2Mini001.@181.164.198.186:9557",  # 122
+        # "rtsp://admin:2Mini001.@181.164.198.186:9556",  # 71
+        # "rtsp://admin:2Mini001.@181.164.198.186:9555",  # 62
+        # "rtsp://admin:2Mini001.@181.164.198.186:9554",  # 52
+        "rtsp://admin:2Mini001.@181.164.198.186:6554",  # 65 linea de caja
     ],
 ]
 # cam = [122]
@@ -63,6 +68,7 @@ def start_opencv_pipelines(camera_addresses, cam, record_time, output_path):
 
     # Iniciar la captura de video para cada cámara
     for i, address in enumerate(camera_addresses):
+
         cap = cv2.VideoCapture(address)
 
         # Verificar si la captura de video se abrió correctamente
