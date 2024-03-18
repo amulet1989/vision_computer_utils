@@ -262,16 +262,16 @@ def onkeypress(event):
 
         # Guardar la salida en un archivo de texto
         with open(image_path.replace(".jpg", ".txt"), "w") as archivo:
-            archivo.write(f"Polígono imagen 1: {str(poligono_planta.tolist())}\n")
+            archivo.write(f"Poligono imagen 1: {str(poligono_planta.tolist())}\n")
             archivo.write(f"{formato_planta}\n")
-            archivo.write(f"Polígono imagen 2 rojo: {str(poligono_cam.tolist())}\n")
+            archivo.write(f"Poligono imagen 2 rojo: {str(poligono_cam.tolist())}\n")
             archivo.write(f"{formato_cam}\n")
             archivo.write(
-                f"Polígono imagen 2 verde: {str(poligono_pruebas.tolist())}\n"
+                f"Poligono imagen 2 verde: {str(poligono_pruebas.tolist())}\n"
             )
             archivo.write(f"{formato_pruebas}\n")
 
-            print(f"Los polígonos han sido guardados en {archivo}")
+            print(f"Los poligonos han sido guardados en {archivo}")
     if event.key == "t":
         # Si se presiona 't', se lee el archivo de configuración y se mapean los puntos de prueba
         cam_id = image_path.split("/")[-1].replace(".jpg", "")

@@ -14,7 +14,7 @@ cam = [
     [122, 71, 62, 52],
 ]
 
-cam = [["65_640x480"], ["65_1280x720"]]
+# cam = [["65_640x480"], ["65_640x480"]]
 
 camera_addresses = [
     [
@@ -22,12 +22,12 @@ camera_addresses = [
         ##############
         # Secundario #
         ##############
-        # "rtsp://admin:2Mini001.@181.164.198.186:9558/h265/ch1/sub/av_stream",  # 246
-        # "rtsp://admin:2Mini001.@181.164.198.186:9559/h265/ch1/sub/av_stream",  # 247
-        # "rtsp://admin:2Mini001.@181.164.198.186:9560/h265/ch1/sub/av_stream",  # 248
-        # "rtsp://admin:2Mini001.@181.164.198.186:9561/h265/ch1/sub/av_stream",  # 249
-        # "rtsp://admin:2Mini001.@181.164.198.186:9562/h265/ch1/sub/av_stream",  # 250
-        ##############
+        "rtsp://admin:2Mini001.@181.164.198.186:9558/h265/ch1/sub/av_stream",  # 246
+        "rtsp://admin:2Mini001.@181.164.198.186:9559/h265/ch1/sub/av_stream",  # 247
+        "rtsp://admin:2Mini001.@181.164.198.186:9560/h265/ch1/sub/av_stream",  # 248
+        "rtsp://admin:2Mini001.@181.164.198.186:9561/h265/ch1/sub/av_stream",  # 249
+        "rtsp://admin:2Mini001.@181.164.198.186:9562/h265/ch1/sub/av_stream",  # 250
+        # ##############
         # # Primario #
         ##############
         # "rtsp://admin:2Mini001.@181.164.198.186:9558",  # 246
@@ -35,7 +35,7 @@ camera_addresses = [
         # "rtsp://admin:2Mini001.@181.164.198.186:9560",  # 248
         # "rtsp://admin:2Mini001.@181.164.198.186:9561",  # 249
         # "rtsp://admin:2Mini001.@181.164.198.186:9562",  # 250
-        "rtsp://admin:2Mini001.@181.164.198.186:6554/live1"  # 65
+        # "rtsp://admin:2Mini001.@181.164.198.186:6554/live1"  # 65
     ],
     [
         # Dahua #
@@ -50,11 +50,11 @@ camera_addresses = [
         ##############
         # # Primario #
         ##############
-        # "rtsp://admin:2Mini001.@181.164.198.186:9557",  # 122
-        # "rtsp://admin:2Mini001.@181.164.198.186:9556",  # 71
-        # "rtsp://admin:2Mini001.@181.164.198.186:9555",  # 62
-        # "rtsp://admin:2Mini001.@181.164.198.186:9554",  # 52
-        "rtsp://admin:2Mini001.@181.164.198.186:6554",  # 65 linea de caja
+        "rtsp://admin:2Mini001.@181.164.198.186:9557",  # 122
+        "rtsp://admin:2Mini001.@181.164.198.186:9556",  # 71
+        "rtsp://admin:2Mini001.@181.164.198.186:9555",  # 62
+        "rtsp://admin:2Mini001.@181.164.198.186:9554",  # 52
+        # "rtsp://admin:2Mini001.@181.164.198.186:6554",  # 65 linea de caja
     ],
 ]
 # cam = [122]

@@ -18,12 +18,13 @@ def map_number_to_color(number):
 
 # Cargar modelo YOLO
 model = YOLO(
-    "trained_models/yolov8m_640x480_cf_9cam_v18.pt"
+    "trained_models/yolov8m_640x480_cf_9cam_v34.pt"
 )  # train_models/yolov8n_4cam.pt
 
 # Create VideoCapture object
-INPUT_VIDEO = seleccionar_video()
-# INPUT_VIDEO = "rtsp://admin:2Mini001.@192.168.88.81/live1"
+# INPUT_VIDEO = seleccionar_video()
+# INPUT_VIDEO = "rtsp://admin:2Mini001.@181.164.198.186:9556/live1"
+INPUT_VIDEO = "rtsp://admin:2Mini001.@181.164.198.186:9560/h265/ch1/sub/av_stream"
 
 plano_planta = cv2.imread(
     "Track_CF_9cam/Planta_CF_9cam.jpg"
@@ -89,7 +90,7 @@ for r in results:
             # print(box)
             mapped_point, bb = bbox_to_planta(
                 box,
-                cam_id="camera52",  # camera62/camera71/camera52/camera122 -
+                cam_id="camera248",  # camera62/camera71/camera52/camera122 -
             )  # Función para mapear el punto a las coordenadas en el plano de planta
 
             # Comprobar si el punto mapeado está dentro de los límites de la imagen
