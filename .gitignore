@@ -187,5 +187,6 @@ videos_capturados/
 train_models/
 Track_CF/
 Track_CF_9cam/
+Track_linea_de_caja/
 trained_models/
 runs/
