@@ -6,34 +6,6 @@ import cv2
 import yaml
 import os
 
-# Cargar las imágenes
-
-
-# ####################
-# # Usando ORB       #
-# ####################
-
-# # Inicializar ORB
-# orb = cv2.BRISK_create()  # ORB_create()
-# # Detectar los puntos clave y calcular los descriptores
-# kp1, des1 = orb.detectAndCompute(imagen1, None)
-# kp2, des2 = orb.detectAndCompute(imagen2, None)
-
-# # Crear un objeto BFMatcher con distancia Hamming como medida
-# bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
-
-# # Emparejar los descriptores con ORB
-# matches = bf.match(des1, des2)
-
-# # Ordenar los emparejamientos en orden de distancia
-# matches = sorted(matches, key=lambda x: x.distance)
-
-# # Dibujar los primeros 10 emparejamientos
-# resultado = cv2.drawMatches(imagen1, kp1, imagen2, kp2, matches[:5], None, flags=2)
-# # Mostrar la imagen
-# cv2.imshow("Emparejamientos", resultado)
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
 
 # Cargar las imágenes a comparar
 imagen1 = plt.imread(utils.seleccionar_imagen())
@@ -257,6 +229,9 @@ fig.canvas.mpl_connect("scroll_event", onscroll)
 plt.tight_layout()
 plt.show()
 
+#########################################
+# Correción de las ROI usando homografía #
+#########################################
 # Convertir los puntos marcados por el usuario a formatos que OpenCV pueda entender
 src_pts = np.float32(puntos_planta).reshape(-1, 1, 2)
 dst_pts = np.float32(puntos_cam).reshape(-1, 1, 2)

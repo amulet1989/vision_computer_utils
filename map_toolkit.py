@@ -54,9 +54,12 @@ def mapping_opencv(puntos_cam, puntos_plano_planta):
     puntos_de_planta = np.float32([puntos_plano_planta])
 
     # Calcular la matriz de transformación (perspectiva)
-    M = cv2.getPerspectiveTransform(
-        puntos_de_cam, puntos_de_planta, solveMethod=0
-    )  #'method == DECOMP_LU || method == DECOMP_SVD || method == DECOMP_EIG || method == DECOMP_CHOLESKY || method == DECOMP_QR'
+    # M = cv2.getPerspectiveTransform(
+    #     puntos_de_cam, puntos_de_planta, solveMethod=0
+    # )  #'method == DECOMP_LU || method == DECOMP_SVD || method == DECOMP_EIG || method == DECOMP_CHOLESKY || method == DECOMP_QR'
+
+    M, mask = cv2.findHomography(puntos_de_cam, puntos_de_planta, cv2.RANSAC, 5.0)
+
     print(f"matriz_transformacion {M}")
 
     # crear un diccionario para guardar la matriz de transformación respectiva a la camara
