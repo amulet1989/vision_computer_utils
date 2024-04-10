@@ -18,13 +18,13 @@ def map_number_to_color(number):
 
 # Cargar modelo YOLO
 model = YOLO(
-    "trained_models/yolov8m_cf_linea_de_caja_640x480_v4.pt"
+    "trained_models/yolov8m_cf_caja_640x480_v8.pt"
 )  # train_models/yolov8n_4cam.pt
 
 # Create VideoCapture object
-# INPUT_VIDEO = seleccionar_video()
+INPUT_VIDEO = seleccionar_video()
 # INPUT_VIDEO = "rtsp://admin:2Mini001.@181.164.198.186:9556/live1"
-INPUT_VIDEO = "rtsp://admin:2Mini001.@181.164.198.186:6554/live1"
+# INPUT_VIDEO = "rtsp://admin:2Mini001.@181.164.198.186:6554/live1"
 
 plano_planta = cv2.imread(
     "Track_CF_9cam/Planta_CF_9cam.jpg"
@@ -42,7 +42,7 @@ cv2.resizeWindow(win_name, 640, 480)
 results = model.track(
     source=INPUT_VIDEO,
     stream=True,
-    save=False,
+    save=True,
     conf=0.4,
     iou=0.7,
     imgsz=640,  # 640 1280
