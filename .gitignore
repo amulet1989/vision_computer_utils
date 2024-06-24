@@ -191,3 +191,5 @@ Track_linea_de_caja/
 trained_models/
 runs/
 Gondolas_Pilar/
+verificar/
+cameras.yaml

@@ -10,7 +10,7 @@ def seleccionar_video():
 
     file_path = filedialog.askopenfilename(
         title="Seleccionar una imagen",
-        filetypes=[("Archivos de video", "*.mp4")],
+        filetypes=[("Archivos de video", "*.mp4 *.avi")],
     )
 
     if file_path:

@@ -18,13 +18,16 @@ def map_number_to_color(number):
 
 # Cargar modelo YOLO
 model = YOLO(
-    "trained_models/yolov8m_cf_caja_640x480_v8.pt"
-)  # train_models/yolov8n_4cam.pt
+    "trained_models/hand_yolov8m_v2.pt"
+)  # train_models/yolov8n_4cam.pt / #yolov8m_tracking_pilar_11cam.pt / hand_yolov8m_v1
+
+# model.export(format="onnx", dynamic=True)
 
 # Create VideoCapture object
-INPUT_VIDEO = seleccionar_video()
+# INPUT_VIDEO = seleccionar_video()
 # INPUT_VIDEO = "rtsp://admin:2Mini001.@181.164.198.186:9556/live1"
-# INPUT_VIDEO = "rtsp://admin:2Mini001.@181.164.198.186:6554/live1"
+# INPUT_VIDEO = "rtsp://admin:2Mini001.@181.164.198.186:9559/h264/ch1/sub/av_stream" 192.168.88.131
+INPUT_VIDEO = "rtsp://admin:2Mini001.@192.168.88.61/live1"
 
 plano_planta = cv2.imread(
     "Track_CF_9cam/Planta_CF_9cam.jpg"
@@ -43,9 +46,9 @@ results = model.track(
     source=INPUT_VIDEO,
     stream=True,
     save=True,
-    conf=0.4,
+    conf=0.2,
     iou=0.7,
-    imgsz=640,  # 640 1280
+    imgsz=704,  # 640 1280
     # classes=classes,
 )  # generator of Results objects
 
@@ -90,7 +93,7 @@ for r in results:
             # print(box)
             mapped_point, bb = bbox_to_planta(
                 box,
-                cam_id="camera65",  # camera62/camera71/camera52/camera122 -
+                cam_id="camera122",  # camera62/camera71/camera52/camera122 - camera65 (caja)
             )  # Función para mapear el punto a las coordenadas en el plano de planta
 
             # Comprobar si el punto mapeado está dentro de los límites de la imagen

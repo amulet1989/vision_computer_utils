@@ -2,65 +2,44 @@ import cv2
 import time
 import argparse
 import os
+import yaml
 
-cam = [
-    [
-        246,
-        247,
-        248,
-        249,
-        250,
-    ],
-    [122, 71, 62, 52],
-]
+# Camaras de Queue managemente
+# cam = [
+#     [
+#         246,
+#         247,
+#         248,
+#         249,
+#         250,
+#     ],
+#     [122, 71, 62, 52],
+# ]
 
-# cam = [["65_640x480"], ["65_640x480"]]
+# Camaras de Turnero
+cam = [["234_640x480"], ["65_640x480"]]
 
-camera_addresses = [
-    [
-        # Hikvision #
-        ##############
-        # Secundario #
-        ##############
-        "rtsp://admin:2Mini001.@181.164.198.186:9558/h264/ch1/sub/av_stream",  # 246
-        "rtsp://admin:2Mini001.@181.164.198.186:9559/h264/ch1/sub/av_stream",  # 247
-        "rtsp://admin:2Mini001.@181.164.198.186:9560/h264/ch1/sub/av_stream",  # 248
-        "rtsp://admin:2Mini001.@181.164.198.186:9561/h264/ch1/sub/av_stream",  # 249
-        "rtsp://admin:2Mini001.@181.164.198.186:9562/h264/ch1/sub/av_stream",  # 250
-        # ##############
-        # # Primario #
-        ##############
-        # "rtsp://admin:2Mini001.@181.164.198.186:9558",  # 246
-        # "rtsp://admin:2Mini001.@181.164.198.186:9559",  # 247
-        # "rtsp://admin:2Mini001.@181.164.198.186:9560",  # 248
-        # "rtsp://admin:2Mini001.@181.164.198.186:9561",  # 249
-        # "rtsp://admin:2Mini001.@181.164.198.186:9562",  # 250
-        # "rtsp://admin:2Mini001.@181.164.198.186:6554/live1"  # 65
-    ],
-    [
-        # Dahua #
-        ##############
-        # Secundario #
-        ##############
-        "rtsp://admin:2Mini001.@181.164.198.186:9557/live1",  # 122
-        "rtsp://admin:2Mini001.@181.164.198.186:9556/live1",  # 71
-        "rtsp://admin:2Mini001.@181.164.198.186:9555/live1",  # 62
-        "rtsp://admin:2Mini001.@181.164.198.186:9554/live1",  # 52
-        # "rtsp://admin:2Mini001.@181.164.198.186:6554/live1",  # 65 linea de caja
-        ##############
-        # # Primario #
-        ##############
-        # "rtsp://admin:2Mini001.@181.164.198.186:9557",  # 122
-        # "rtsp://admin:2Mini001.@181.164.198.186:9556",  # 71
-        # "rtsp://admin:2Mini001.@181.164.198.186:9555",  # 62
-        # "rtsp://admin:2Mini001.@181.164.198.186:9554",  # 52
-        # "rtsp://admin:2Mini001.@181.164.198.186:6554",  # 65 linea de caja
-    ],
-]
-# cam = [122]
+# Lee el archivo YAML "cameras.yaml"
+with open("cameras.yaml", "r") as file:
+    data = yaml.safe_load(file)
+
+# Asigna las direcciones a la variable camera_addresses
+camera_addresses = data["cameras"]
+
+# Imprime para verificar
+print(camera_addresses)
 
 
 def start_opencv_pipelines(camera_addresses, cam, record_time, output_path):
+    """
+    Start OpenCV pipelines for each camera and record the output to a video file.
+    :param camera_addresses: List of camera addresses.
+    :param cam: List of camera names.
+    :param record_time: Time in seconds to record the output.
+    :param output_path: Path to the output directory.
+
+    """
+
     # Obtener la fecha y hora actual para generar nombres de archivo
     current_datetime = time.strftime("%Y%m%d_%H%M%S")
 
