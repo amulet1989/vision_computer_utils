@@ -17,7 +17,8 @@ import yaml
 # ]
 
 # Camaras de Turnero
-cam = [["234_640x480"], ["65_640x480"]]
+# cam = [["234_640x480"], ["65_640x480"]]
+cam = [["245_704x576"], ["245"]]
 
 # Lee el archivo YAML "cameras.yaml"
 with open("cameras.yaml", "r") as file:
