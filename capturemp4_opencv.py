@@ -21,11 +21,6 @@ import yaml
 # cam = [["245_704x576"], ["245"]]
 cam = [
     [
-        "G7V",
-        "G8V",
-        "G9V",
-        "G10V",
-        "G11V",
         "Entrada1",
         # "Entrada2",
         "Track_3",
@@ -36,6 +31,11 @@ cam = [
         "Salida1",
         # "Salida2",
         # "Ojo_pez",
+        "G7V",
+        "G8V",
+        "G9V",
+        "G10V",
+        "G11V",
     ],
     ["otras"],
 ]
