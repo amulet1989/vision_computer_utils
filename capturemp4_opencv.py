@@ -90,7 +90,7 @@ def start_opencv_pipelines(camera_addresses, cam, record_time, output_path):
         cv2.VideoWriter(
             f"{output_path}/camera{cam[i]}_{current_datetime}.mp4",
             cv2.VideoWriter_fourcc(*"mp4v"),
-            10.0,
+            20.0,
             (
                 int(cap.get(3)),
                 int(cap.get(4)),
