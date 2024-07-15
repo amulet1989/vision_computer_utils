@@ -18,7 +18,28 @@ import yaml
 
 # Camaras de Turnero
 # cam = [["234_640x480"], ["65_640x480"]]
-cam = [["245_704x576"], ["245"]]
+# cam = [["245_704x576"], ["245"]]
+cam = [
+    [
+        "G7V",
+        "G8V",
+        "G9V",
+        "G10V",
+        "G11V",
+        "Entrada1",
+        "Entrada2",
+        "Track_3",
+        "Track_4",
+        "Track_5",
+        "Track_6",
+        "Track_7",
+        "Salida1",
+        "Salida2",
+        # "Ojo_pez",
+    ],
+    ["otras"],
+]
+
 
 # Lee el archivo YAML "cameras.yaml"
 with open("cameras.yaml", "r") as file:
@@ -69,7 +90,7 @@ def start_opencv_pipelines(camera_addresses, cam, record_time, output_path):
         cv2.VideoWriter(
             f"{output_path}/camera{cam[i]}_{current_datetime}.mp4",
             cv2.VideoWriter_fourcc(*"mp4v"),
-            20.0,
+            10.0,
             (
                 int(cap.get(3)),
                 int(cap.get(4)),
