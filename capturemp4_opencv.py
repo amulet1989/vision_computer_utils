@@ -18,27 +18,27 @@ import yaml
 
 # Camaras de Turnero
 # cam = [["234_640x480"], ["65_640x480"]]
-# cam = [["245_704x576"], ["245"]]
-cam = [
-    [
-        # "Entrada1",
-        # # "Entrada2",
-        # "Track_3",
-        # "Track_4",
-        # "Track_5",
-        # "Track_6",
-        # "Track_7",
-        # "Salida1",
-        # "Salida2",
-        # "Ojo_pez",
-        "G7V",
-        "G8V",
-        "G9V",
-        "G10V",
-        "G11V",
-    ],
-    ["otras"],
-]
+cam = [["245_704x576"], ["245"]]
+# cam = [
+#     [
+#         # "Entrada1",
+#         # # "Entrada2",
+#         # "Track_3",
+#         # "Track_4",
+#         # "Track_5",
+#         # "Track_6",
+#         # "Track_7",
+#         # "Salida1",
+#         # "Salida2",
+#         # "Ojo_pez",
+#         "G7V",
+#         "G8V",
+#         "G9V",
+#         "G10V",
+#         "G11V",
+#     ],
+#     ["otras"],
+# ]
 
 
 # Lee el archivo YAML "cameras.yaml"
