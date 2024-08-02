@@ -18,6 +18,19 @@ root = tree.getroot()
 
 # Función para reflejar la imagen si es necesario
 def pad_and_reflect(image, bbox, target_size=608):
+    """
+    Pads or reflects an image with edge cases to achieve a cropped region
+    of target_size around the bounding box.
+
+    Args:
+        image (PIL.Image): The image to be padded or reflected.
+        bbox (tuple): Bounding box coordinates (xtl, ytl, xbr, ybr).
+        target_size (int, optional): Desired size of the cropped region (default: 608).
+
+    Returns:
+        PIL.Image: The padded or reflected cropped image.
+    """
+
     width, height = image.size
     xtl, ytl, xbr, ybr = bbox
 
@@ -31,31 +44,30 @@ def pad_and_reflect(image, bbox, target_size=608):
     right = int(cx + half_size)
     lower = int(cy + half_size)
 
-    # Reflecting the required parts
-    if left < 0 or right > width or upper < 0 or lower > height:
-        crop = Image.new("RGB", (target_size, target_size))
+    crop = Image.new("RGB", (target_size, target_size))
 
-        for i in range(left, right, width):
-            for j in range(upper, lower, height):
-                box = (
-                    max(0, -i),
-                    max(0, -j),
-                    min(width, width - i),
-                    min(height, height - j),
-                )
-                region = image.crop(box)
-                crop.paste(region, (max(0, i), max(0, j)))
+    for i in range(left, right, width):
+        for j in range(upper, lower, height):
+            box = (
+                max(0, -i),
+                max(0, -j),
+                min(width, width - i),
+                min(height, height - j),
+            )
+            region = image.crop(box)
+            crop.paste(region, (max(0, i), max(0, j)))
 
-                if i < 0:  # reflect left side
-                    crop.paste(ImageOps.mirror(region), (width + i, max(0, j)))
-                if j < 0:  # reflect top side
-                    crop.paste(ImageOps.flip(region), (max(0, i), height + j))
-                if i < 0 and j < 0:  # reflect top-left corner
-                    crop.paste(
-                        ImageOps.mirror(ImageOps.flip(region)), (width + i, height + j)
-                    )
-    else:
-        crop = image.crop((left, upper, right, lower))
+    # Reflecting based on edge cases
+    if left < 0:
+        crop.paste(ImageOps.mirror(region), (width + i, max(0, j)))
+    if upper < 0:
+        crop.paste(ImageOps.flip(region), (max(0, i), height + j))
+    if left < 0 and upper < 0:
+        crop.paste(ImageOps.mirror(ImageOps.flip(region)), (width + i, height + j))
+    if right > width:
+        crop.paste(region, (0, max(0, j)))  # Paste right side within bounds
+    if lower > height:
+        crop.paste(region, (max(0, i), 0))  # Paste bottom side within bounds
 
     return crop
 
