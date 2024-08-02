@@ -206,7 +206,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    model = YOLO("trained_models/yolov8m_cf_caja_640x480_v9.pt")
+    model = YOLO("trained_models/yolov8m_cf_caja_640x480_v12.pt")
     roi = [[97, 76], [605, 93], [595, 417], [86, 433]]
     while True:
         if detect_person_rtsp(camera_addresses[0][0], model, detection_time=3, roi=roi):
