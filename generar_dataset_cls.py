@@ -4,7 +4,7 @@ from PIL import Image, ImageOps
 
 # Ruta del archivo de anotaciones y carpeta de imágenes
 annotations_path = "./videos_capturados/Pilar_cellphone/annotations.xml"
-images_folder = "./videos_capturados/Pilar_cellphone/images"
+images_folder = "./videos_capturados/Pilar_cellphone/images/train"
 output_folder = "./videos_capturados/Pilar_cellphone/output"
 
 # Crear la carpeta de salida si no existe
