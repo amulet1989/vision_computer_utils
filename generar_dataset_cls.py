@@ -18,7 +18,7 @@ tree = ET.parse(annotations_path)
 root = tree.getroot()
 
 
-# Función para reflejar la imagen si es necesario
+# Función para reflejar la imagen sin incluir el BBox
 def pad_and_reflect(image, bbox, target_size=608):
     height, width, _ = image.shape
     xtl, ytl, xbr, ybr = bbox
@@ -33,33 +33,59 @@ def pad_and_reflect(image, bbox, target_size=608):
     right = int(cx + half_size)
     lower = int(cy + half_size)
 
-    if left < 0 or right > width or upper < 0 or lower > height:
-        # Pad the image
-        pad_left = max(0, -left)
-        pad_top = max(0, -upper)
-        pad_right = max(0, right - width)
-        pad_bottom = max(0, lower - height)
+    padded_image = np.zeros((target_size, target_size, 3), dtype=image.dtype)
 
-        padded_image = cv2.copyMakeBorder(
-            image,
-            pad_top,
-            pad_bottom,
-            pad_left,
-            pad_right,
-            borderType=cv2.BORDER_REFLECT,
-        )
+    # Calculate padding
+    pad_left = max(0, -left)
+    pad_top = max(0, -upper)
+    pad_right = max(0, right - width)
+    pad_bottom = max(0, lower - height)
 
-        # Recalculate the new bbox coordinates
-        new_left = left + pad_left
-        new_upper = upper + pad_top
-        new_right = right + pad_left
-        new_lower = lower + pad_top
+    # Calculate cropping area
+    crop_left = max(0, left)
+    crop_top = max(0, upper)
+    crop_right = min(width, right)
+    crop_bottom = min(height, lower)
 
-        crop = padded_image[new_upper:new_lower, new_left:new_right]
-    else:
-        crop = image[upper:lower, left:right]
+    crop = image[crop_top:crop_bottom, crop_left:crop_right]
 
-    return crop
+    padded_image[
+        pad_top : pad_top + crop.shape[0], pad_left : pad_left + crop.shape[1]
+    ] = crop
+
+    if pad_left > 0:
+        left_reflect = np.fliplr(crop[:, :pad_left])
+        padded_image[pad_top : pad_top + crop.shape[0], :pad_left] = left_reflect
+
+    if pad_top > 0:
+        top_reflect = np.flipud(crop[:pad_top, :])
+        padded_image[:pad_top, pad_left : pad_left + crop.shape[1]] = top_reflect
+
+    if pad_right > 0:
+        right_reflect = np.fliplr(crop[:, -pad_right:])
+        padded_image[pad_top : pad_top + crop.shape[0], -pad_right:] = right_reflect
+
+    if pad_bottom > 0:
+        bottom_reflect = np.flipud(crop[-pad_bottom:, :])
+        padded_image[-pad_bottom:, pad_left : pad_left + crop.shape[1]] = bottom_reflect
+
+    if pad_left > 0 and pad_top > 0:
+        top_left_reflect = np.flipud(left_reflect[:pad_top, :])
+        padded_image[:pad_top, :pad_left] = top_left_reflect
+
+    if pad_right > 0 and pad_top > 0:
+        top_right_reflect = np.flipud(right_reflect[:pad_top, :])
+        padded_image[:pad_top, -pad_right:] = top_right_reflect
+
+    if pad_left > 0 and pad_bottom > 0:
+        bottom_left_reflect = np.flipud(left_reflect[-pad_bottom:, :])
+        padded_image[-pad_bottom:, :pad_left] = bottom_left_reflect
+
+    if pad_right > 0 and pad_bottom > 0:
+        bottom_right_reflect = np.flipud(right_reflect[-pad_bottom:, :])
+        padded_image[-pad_bottom:, -pad_right:] = bottom_right_reflect
+
+    return padded_image
 
 
 # Procesar cada imagen en las anotaciones
