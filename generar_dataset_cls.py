@@ -45,10 +45,10 @@ def pad_and_reflect(image, bbox, target_size=608):
 
     if left == 0 or right == width:
         crop = ImageOps.expand(crop, (padding[0], 0, padding[2], 0), fill=0)
-        crop = ImageOps.mirror(crop)
+        # crop = ImageOps.mirror(crop)
     if upper == 0 or lower == height:
         crop = ImageOps.expand(crop, (0, padding[1], 0, padding[3]), fill=0)
-        crop = ImageOps.flip(crop)
+        # crop = ImageOps.flip(crop)
 
     return crop
 
