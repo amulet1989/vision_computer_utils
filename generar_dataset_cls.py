@@ -26,29 +26,36 @@ def pad_and_reflect(image, bbox, target_size=608):
 
     half_size = target_size // 2
 
-    left = max(0, int(cx - half_size))
-    upper = max(0, int(cy - half_size))
-    right = min(width, int(cx + half_size))
-    lower = min(height, int(cy + half_size))
+    left = int(cx - half_size)
+    upper = int(cy - half_size)
+    right = int(cx + half_size)
+    lower = int(cy + half_size)
 
-    crop = image.crop((left, upper, right, lower))
+    # Reflecting the required parts
+    if left < 0 or right > width or upper < 0 or lower > height:
+        crop = Image.new("RGB", (target_size, target_size))
 
-    # Reflect the padding if necessary
-    delta_w = target_size - (right - left)
-    delta_h = target_size - (lower - upper)
-    padding = (
-        delta_w // 2,
-        delta_h // 2,
-        delta_w - (delta_w // 2),
-        delta_h - (delta_h // 2),
-    )
+        for i in range(left, right, width):
+            for j in range(upper, lower, height):
+                box = (
+                    max(0, -i),
+                    max(0, -j),
+                    min(width, width - i),
+                    min(height, height - j),
+                )
+                region = image.crop(box)
+                crop.paste(region, (max(0, i), max(0, j)))
 
-    if left == 0 or right == width:
-        crop = ImageOps.expand(crop, (padding[0], 0, padding[2], 0), fill=0)
-        crop = ImageOps.mirror(crop)
-    if upper == 0 or lower == height:
-        crop = ImageOps.expand(crop, (0, padding[1], 0, padding[3]), fill=0)
-        crop = ImageOps.flip(crop)
+                if i < 0:  # reflect left side
+                    crop.paste(ImageOps.mirror(region), (width + i, max(0, j)))
+                if j < 0:  # reflect top side
+                    crop.paste(ImageOps.flip(region), (max(0, i), height + j))
+                if i < 0 and j < 0:  # reflect top-left corner
+                    crop.paste(
+                        ImageOps.mirror(ImageOps.flip(region)), (width + i, height + j)
+                    )
+    else:
+        crop = image.crop((left, upper, right, lower))
 
     return crop
 
