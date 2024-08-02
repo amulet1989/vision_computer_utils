@@ -32,16 +32,25 @@ def pad_and_reflect(image, bbox, target_size=608):
     lower = min(height, int(cy + half_size))
 
     crop = image.crop((left, upper, right, lower))
+
+    # Reflect the padding if necessary
     delta_w = target_size - (right - left)
     delta_h = target_size - (lower - upper)
-
     padding = (
         delta_w // 2,
         delta_h // 2,
         delta_w - (delta_w // 2),
         delta_h - (delta_h // 2),
     )
-    return ImageOps.expand(crop, padding, fill="reflect")
+
+    if left == 0 or right == width:
+        crop = ImageOps.expand(crop, (padding[0], 0, padding[2], 0), fill=0)
+        crop = ImageOps.mirror(crop)
+    if upper == 0 or lower == height:
+        crop = ImageOps.expand(crop, (0, padding[1], 0, padding[3]), fill=0)
+        crop = ImageOps.flip(crop)
+
+    return crop
 
 
 # Procesar cada imagen en las anotaciones
