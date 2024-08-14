@@ -18,7 +18,7 @@ import yaml
 
 # Camaras de Turnero
 # cam = [["234_640x480"], ["65_640x480"]]
-cam = [["245_704x576"], ["245"]]
+cam = [["245_640x480"], ["245"]]
 # cam = [
 #     [
 #         # "Entrada1",
