@@ -54,6 +54,7 @@ def check_cinta_libre(ref_image, current_image, pts, umbral=15):
 
 
 if __name__ == "__main__":
+
     # Cargar la imagen de referencia (cinta sin productos) y la imagen actual
     ref_image = cv2.imread("./videos_capturados/camera245_640x480_ref.jpg")
     current_image = cv2.imread(
