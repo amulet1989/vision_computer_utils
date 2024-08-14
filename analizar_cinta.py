@@ -8,7 +8,7 @@ def check_cinta_libre(ref_image, current_image, pts, umbral=15):
     current_image: Imagen actual
     pts: Puntos de la ROI (polígono)
     umbral: Umbral de porcentaje de diferencia (por defecto 15%)
-    return: diff, diff_thresh, flag
+    return: diff, diff_thresh, flag, percentage_diff
     flag=True: Área libre de objetos
     flag=False: Área ocupada por un objeto
 
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     # Cargar la imagen de referencia (cinta sin productos) y la imagen actual
     ref_image = cv2.imread("./videos_capturados/camera245_640x480_ref.jpg")
     current_image = cv2.imread(
-        "./videos_capturados/linea_de_caja_train/camera245_704x576_20240731_160223-00008.jpg"
+        "./videos_capturados/linea_de_caja_train/camera245_704x576_20240731_190654-00010.jpg"
     )
 
     # Definir los cuatro puntos de la ROI en ambas imágenes (en este caso, son iguales)
