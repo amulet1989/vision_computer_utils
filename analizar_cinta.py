@@ -41,16 +41,13 @@ def check_cinta_libre(ref_image, current_image, pts, umbral=15):
 
     # Calcular el porcentaje de píxeles diferentes
     percentage_diff = (non_zero_count / roi_pixel_count) * 100
-    print(f"Porcentaje de píxeles diferentes en la ROI: {percentage_diff:.2f}%")
 
     # Determinar si el área está libre basándose en el porcentaje de diferencia
     if percentage_diff < umbral:  # Umbral del 15%
-        print("Área libre de objetos")
         flag = True
     else:
-        print("Área ocupada por un objeto")
         flag = False
-    return diff, diff_thresh, flag
+    return diff, diff_thresh, flag, percentage_diff
 
 
 if __name__ == "__main__":
@@ -67,10 +64,19 @@ if __name__ == "__main__":
     )  # ROI Grande: [[100, 169], [100, 270], [209, 277], [213, 163]] / ROI Chica: [[102, 172], [171, 168], [171, 275], [102, 271]]
 
     # Correr la funcion
-    diff, diff_thresh, flag = check_cinta_libre(ref_image, current_image, pts, 15)
+    diff, diff_thresh, flag, percentage_diff = check_cinta_libre(
+        ref_image, current_image, pts, 15
+    )
+
     # Dibujar la ROI en ambas imágenes
     cv2.polylines(ref_image, [pts], isClosed=True, color=(0, 255, 0), thickness=2)
     cv2.polylines(current_image, [pts], isClosed=True, color=(0, 255, 0), thickness=2)
+
+    print(f"Porcentaje de píxeles diferentes en la ROI: {percentage_diff:.2f}%")
+    if flag:
+        print("Área libre de objetos")
+    else:
+        print("Área ocupada por un objeto")
 
     # Mostrar las imágenes con la ROI dibujada
     cv2.imshow("Imagen de Referencia con ROI", ref_image)
