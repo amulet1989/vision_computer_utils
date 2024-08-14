@@ -21,7 +21,7 @@ def check_cinta_libre(ref_image, current_image, pts, umbral=15):
     roi_ref = cv2.bitwise_and(ref_image, ref_image, mask=mask)
     roi_current = cv2.bitwise_and(current_image, current_image, mask=mask)
 
-    # Convertir a escala de grises para simplificar la comparación
+    # Convertir a escala de grises
     roi_ref_gray = cv2.cvtColor(roi_ref, cv2.COLOR_BGR2GRAY)
     roi_current_gray = cv2.cvtColor(roi_current, cv2.COLOR_BGR2GRAY)
 
