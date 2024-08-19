@@ -27,6 +27,7 @@ def check_cinta_libre(ref_image, current_image, pts, umbral=15, varThreshold=35)
     #####################################################
 
     # Inicializar el sustractor de fondo
+    # MOG2 (Mixture of Gaussians 2)
     bg_subtractor = cv2.createBackgroundSubtractorMOG2(
         history=1, varThreshold=varThreshold, detectShadows=False
     )
@@ -82,7 +83,7 @@ if __name__ == "__main__":
     # Cargar la imagen de referencia (cinta sin productos) y la imagen actual
     ref_image = cv2.imread("./videos_capturados/camera245_640x480_ref.jpg")
     current_image = cv2.imread(
-        "./videos_capturados/pruebas_cinta/camera245_704x576_20240731_204910-00004.jpg"  # linea_de_caja_val/camera245_704x576_20240731_102519-00010.jpg
+        "./videos_capturados/pruebas_cinta/camera245_704x576_20240731_102519-00011.jpg"  # linea_de_caja_val/camera245_704x576_20240731_102519-00010.jpg
     )  # linea_de_caja_train/camera245_704x576_20240731_204910-00003.jpg / linea_de_caja_train/camera245_704x576_20240731_103532-00001
 
     # Definir los cuatro puntos de la ROI en ambas imágenes (en este caso, son iguales)
