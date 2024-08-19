@@ -83,7 +83,7 @@ def resize_images_in_directory(directory_path, width, height):
 
 
 # obtener el frame n de un video y guardarlo como una imagen jpg
-def get_frame_from_video(video_path, frame_number, width, height):
+def get_frame_from_video(video_path, frame_number, width=None, height=None):
     video = cv2.VideoCapture(video_path)
     # obtener el frame n del video
     video.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
@@ -91,7 +91,10 @@ def get_frame_from_video(video_path, frame_number, width, height):
     # guardar la imagen como un archivo jpg
     # cv2.imwrite(f"frame_{frame_number}.jpg", frame)
     # redimensionar la imagen
-    resized_frame = cv2.resize(frame, (width, height))
+    if width and height:
+        resized_frame = cv2.resize(frame, (width, height))
+    else:
+        resized_frame = frame
     return resized_frame
 
 

@@ -12,7 +12,10 @@ import cv2
 # Sacar un frame de un video y hacerle resize
 video_path = utils.seleccionar_video()
 # obtener una imagen de un video
-image_frame = utils.get_frame_from_video(video_path, 5, 640, 480)  # 1280,720 - 640,480
+image_frame = utils.get_frame_from_video(
+    video_path,
+    5,
+)  # 1280,720 - 640,480
 # guardar la imagen en la misma carpeta del video
 cv2.imwrite(f"{video_path}_640x480.jpg", image_frame)
 
