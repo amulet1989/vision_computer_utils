@@ -127,3 +127,31 @@ def resize_video(video_path, width, height, fps=20.0):
     cap.release()
     out.release()
     cv2.destroyAllWindows()
+
+
+# Obtener todos lo path de imagenes dentro d euna carpeta
+def get_image_paths(directory_path):
+    image_paths = []
+    for file_name in os.listdir(directory_path):
+        if not file_name.endswith(".jpg"):
+            continue
+        file_path = os.path.join(directory_path, file_name)
+        if os.path.isfile(file_path):
+            image_paths.append(file_path)
+    return image_paths
+
+
+# Convertir video en frames jpg
+def video_to_frames(video_path, output_folder):
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+    cap = cv2.VideoCapture(video_path)
+    frame_count = 0
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+        frame_path = os.path.join(output_folder, f"frame_{frame_count}.jpg")
+        cv2.imwrite(frame_path, frame)
+        frame_count += 1
+    cap.release()
