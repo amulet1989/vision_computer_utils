@@ -37,13 +37,16 @@ def train_bg_subtractor(image_files, mask):
     return average_image
 
 
-def check_cinta_libre(ref_image, current_image, pts, umbral=15, varThreshold=35):
+def check_cinta_libre(
+    ref_image, current_image, pts, umbral=15, varThreshold=35, metodo=0
+):
     """
     ref_image: Imagen de referencia
     current_image: Imagen actual
     pts: Puntos de la ROI (polígono)
     umbral: Umbral de porcentaje de diferencia (por defecto 15%)
     varThreshold: Umbral de detección de cambios en el fondo (por defecto 35) mientras más bajo más sensible a los cambios
+    metodo: 0: Diferencia absoluta, 1: Modelo de fondo MOG2
     return: diff, diff_thresh, flag, percentage_diff
     flag=True: Área libre de objetos
     flag=False: Área ocupada por un objeto
@@ -67,46 +70,46 @@ def check_cinta_libre(ref_image, current_image, pts, umbral=15, varThreshold=35)
     # imag_prom = train_bg_subtractor(image_files, mask)
     # imag_prom = cv2.imread("average_image.jpg")
 
-    #####################################################
-    ###### Usar un modelo de sustracción de fondo ######
-    #####################################################
+    if metodo == 1:
+        #####################################################
+        ###### Usar un modelo de sustracción de fondo ######
+        #####################################################
+        # Inicializar el sustractor de fondo
+        # MOG2 (Mixture of Gaussians 2)
+        bg_subtractor = cv2.createBackgroundSubtractorMOG2(
+            history=1, varThreshold=varThreshold, detectShadows=True
+        )
+        # bg_subtractor = train_bg_subtractor(bg_subtractor, image_files, mask)
 
-    # # Inicializar el sustractor de fondo
-    # # MOG2 (Mixture of Gaussians 2)
-    bg_subtractor = cv2.createBackgroundSubtractorMOG2(
-        history=1, varThreshold=varThreshold, detectShadows=True
-    )
-    # bg_subtractor = train_bg_subtractor(bg_subtractor, image_files, mask)
+        # Aplicar la sustracción de fondo
+        # Alimentar el sustractor con la imagen de referencia para que aprenda el fondo
+        bg_subtractor.apply(roi_ref, learningRate=1.0)
 
-    # Aplicar la sustracción de fondo
-    # Alimentar el sustractor con la imagen de referencia para que aprenda el fondo
-    bg_subtractor.apply(roi_ref, learningRate=1.0)
+        # Procesar la imagen actual para detectar diferencias
+        diff = bg_subtractor.apply(roi_current, learningRate=0)
 
-    # Procesar la imagen actual para detectar diferencias
-    diff = bg_subtractor.apply(roi_current, learningRate=0)
+        # Eliminar pequeñas manchas blancas usando una apertura morfológicas (opening)
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+        diff_thresh = cv2.morphologyEx(diff, cv2.MORPH_OPEN, kernel)
 
-    # Eliminar pequeñas manchas blancas usando una apertura morfológicas (opening)
-    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
-    diff_thresh = cv2.morphologyEx(diff, cv2.MORPH_OPEN, kernel)
+        # Volver a circunscribir la imagen resultante a la ROI
+        diff_thresh = cv2.bitwise_and(diff_thresh, diff_thresh, mask=mask)
+        # diff_thresh = cv2.bitwise_and(diff, diff, mask=mask)
+        # ########################################################
+    else:
+        ######################################
+        ###### Usar diferencia absoluta ######
+        ######################################
+        # Convertir a escala de grises
+        roi_ref_gray = cv2.cvtColor(roi_ref, cv2.COLOR_BGR2GRAY)
+        roi_current_gray = cv2.cvtColor(roi_current, cv2.COLOR_BGR2GRAY)
 
-    # Volver a circunscribir la imagen resultante a la ROI
-    diff_thresh = cv2.bitwise_and(diff_thresh, diff_thresh, mask=mask)
-    # diff_thresh = cv2.bitwise_and(diff, diff, mask=mask)
-    ########################################################
+        # Calcular la diferencia absoluta entre la imagen de referencia y la imagen actual
+        diff = cv2.absdiff(roi_ref_gray, roi_current_gray)
 
-    ######################################
-    ###### Usar diferencia absoluta ######
-    ######################################
-    # # Convertir a escala de grises
-    # roi_ref_gray = cv2.cvtColor(roi_ref, cv2.COLOR_BGR2GRAY)
-    # roi_current_gray = cv2.cvtColor(roi_current, cv2.COLOR_BGR2GRAY)
-
-    # # Calcular la diferencia absoluta entre la imagen de referencia y la imagen actual
-    # diff = cv2.absdiff(roi_ref_gray, roi_current_gray)
-
-    # # Umbralizar la imagen de diferencia para obtener una imagen binaria
-    # _, diff_thresh = cv2.threshold(diff, 30, 255, cv2.THRESH_BINARY)
-    #####################################
+        # Umbralizar la imagen de diferencia para obtener una imagen binaria
+        _, diff_thresh = cv2.threshold(diff, 30, 255, cv2.THRESH_BINARY)
+        ####################################
 
     # Contar los píxeles en la ROI
     roi_pixel_count = np.count_nonzero(mask)
@@ -194,6 +197,12 @@ if __name__ == "__main__":
         default=25,
         help="Umbral de detección de cambios en el fondo",
     )
+    parser.add_argument(
+        "--metodo",
+        type=int,
+        default=0,
+        help="0: Diferencia absoluta, 1: Modelo de fondo MOG2",
+    )
     args = parser.parse_args()
 
     # Cargar la imagen de referencia (cinta sin productos)
@@ -219,6 +228,7 @@ if __name__ == "__main__":
             pts,
             umbral=args.umbral,
             varThreshold=args.varThreshold,
+            metodo=args.metodo,
         )
 
         # Dibujar la ROI en el frame actual
