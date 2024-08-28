@@ -3,6 +3,7 @@ import numpy as np
 from src import utils
 import pickle
 from sys import argv
+import argparse
 
 
 def train_bg_subtractor(image_files, mask):
@@ -182,6 +183,19 @@ def check_cinta_libre(ref_image, current_image, pts, umbral=15, varThreshold=35)
 
 ## Con video ###
 if __name__ == "__main__":
+    # Añadir parser para las variables umbral=15, varThreshold=25
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--umbral", type=float, default=15.0, help="Umbral de porcentaje de diferencia"
+    )
+    parser.add_argument(
+        "--varThreshold",
+        type=int,
+        default=25,
+        help="Umbral de detección de cambios en el fondo",
+    )
+    args = parser.parse_args()
+
     # Cargar la imagen de referencia (cinta sin productos)
     ref_image = cv2.imread("./videos_capturados/camera245_640x480_ref.jpg")
     average_image = cv2.imread("average_image_caja5.jpg")
@@ -200,7 +214,11 @@ if __name__ == "__main__":
 
         # Procesar el frame actual
         diff, diff_thresh, flag, percentage_diff = check_cinta_libre(
-            average_image, frame, pts, umbral=15, varThreshold=25
+            average_image,
+            frame,
+            pts,
+            umbral=args.umbral,
+            varThreshold=args.varThreshold,
         )
 
         # Dibujar la ROI en el frame actual
