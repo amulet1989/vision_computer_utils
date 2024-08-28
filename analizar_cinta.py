@@ -17,16 +17,16 @@ def train_bg_subtractor(image_files, mask):
     for image_file in image_files:
         ref_image = cv2.imread(image_file)
         # Aplicar la máscara para extraer la ROI de ambas imágenes
-        roi_ref = cv2.bitwise_and(ref_image, ref_image, mask=mask)
-        roi_ref = roi_ref.astype(np.float32)
-        accumulated_image = cv2.add(accumulated_image, roi_ref)
+        # roi_ref = cv2.bitwise_and(ref_image, ref_image, mask=mask)
+        accumulated_image = cv2.add(accumulated_image, ref_image.astype(np.float32))
         # bg_subtractor.apply(roi_ref, learningRate=1.0)
 
-        # Dividir por el número de imágenes para obtener la imagen promedio
+    # Dividir por el número de imágenes para obtener la imagen promedio
     average_image = accumulated_image / len(image_files)
 
     # Convertir de nuevo a formato de imagen (uint8)
     average_image = np.clip(average_image, 0, 255).astype(np.uint8)
+    average_image = cv2.bitwise_and(average_image, average_image, mask=mask)
 
     # # Guardar o mostrar la imagen promedio
     cv2.imwrite("average_image_caja5.jpg", average_image)
