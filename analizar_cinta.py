@@ -28,7 +28,7 @@ def train_bg_subtractor(image_files, mask):
     average_image = np.clip(average_image, 0, 255).astype(np.uint8)
 
     # # Guardar o mostrar la imagen promedio
-    # cv2.imwrite("average_image.jpg", average_image)
+    cv2.imwrite("average_image_caja5.jpg", average_image)
     # cv2.imshow("Imagen Promedio", average_image)
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()
@@ -62,7 +62,7 @@ def check_cinta_libre(ref_image, current_image, pts, umbral=15, varThreshold=35)
     #     directory_path
     # )  # Lista de imágenes de referencia
 
-    # Entrenar el modelo de fondo con imágenes de referencia
+    # # Entrenar el modelo de fondo con imágenes de referencia
     # imag_prom = train_bg_subtractor(image_files, mask)
     # imag_prom = cv2.imread("average_image.jpg")
 
@@ -184,7 +184,7 @@ def check_cinta_libre(ref_image, current_image, pts, umbral=15, varThreshold=35)
 if __name__ == "__main__":
     # Cargar la imagen de referencia (cinta sin productos)
     ref_image = cv2.imread("./videos_capturados/camera245_640x480_ref.jpg")
-    average_image = cv2.imread("average_image.jpg")
+    average_image = cv2.imread("average_image_caja5.jpg")
 
     # Cargar el video
     video_path = utils.seleccionar_video()
