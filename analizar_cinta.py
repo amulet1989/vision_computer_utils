@@ -37,6 +37,15 @@ def train_bg_subtractor(image_files, mask):
     return average_image
 
 
+def aplicar_clahe(image, clipLimit=2.0, tileGridSize=(8, 8)):
+    lab_image = cv2.cvtColor(image, cv2.COLOR_BGR2Lab)
+    l_channel, a, b = cv2.split(lab_image)
+    clahe = cv2.createCLAHE(clipLimit=clipLimit, tileGridSize=tileGridSize)
+    l_channel_clahe = clahe.apply(l_channel)
+    lab_image_clahe = cv2.merge((l_channel_clahe, a, b))
+    return cv2.cvtColor(lab_image_clahe, cv2.COLOR_Lab2BGR)
+
+
 def check_cinta_libre(
     ref_image, current_image, pts, umbral=15, varThreshold=35, metodo=0
 ):
@@ -59,6 +68,7 @@ def check_cinta_libre(
     # Aplicar la máscara para extraer la ROI de ambas imágenes
     roi_ref = cv2.bitwise_and(ref_image, ref_image, mask=mask)
     roi_current = cv2.bitwise_and(current_image, current_image, mask=mask)
+    roi_current_o = roi_current.copy()
 
     # Modelo prentrenado
     # directory_path = "./videos_capturados/Image_ref"
@@ -74,6 +84,11 @@ def check_cinta_libre(
         #####################################################
         ###### Usar un modelo de sustracción de fondo ######
         #####################################################
+        # Mejorar contraste con CLAHE
+        # roi_ref = aplicar_clahe(roi_ref)
+        # roi_current = aplicar_clahe(roi_current)
+        ##########################################
+
         # Inicializar el sustractor de fondo
         # MOG2 (Mixture of Gaussians 2)
         bg_subtractor = cv2.createBackgroundSubtractorMOG2(
@@ -100,6 +115,12 @@ def check_cinta_libre(
         ######################################
         ###### Usar diferencia absoluta ######
         ######################################
+
+        # Mejorar contraste con CLAHE
+        # roi_ref = aplicar_clahe(roi_ref)
+        # roi_current = aplicar_clahe(roi_current)
+        ##########################################
+
         # Convertir a escala de grises
         roi_ref_gray = cv2.cvtColor(roi_ref, cv2.COLOR_BGR2GRAY)
         roi_current_gray = cv2.cvtColor(roi_current, cv2.COLOR_BGR2GRAY)
@@ -110,6 +131,10 @@ def check_cinta_libre(
         # Umbralizar la imagen de diferencia para obtener una imagen binaria
         _, diff_thresh = cv2.threshold(diff, 30, 255, cv2.THRESH_BINARY)
         ####################################
+    cv2.imshow("Imagen inicial", roi_current_o)
+    cv2.imshow("Imagen Mejorada", roi_current)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
     # Contar los píxeles en la ROI
     roi_pixel_count = np.count_nonzero(mask)
