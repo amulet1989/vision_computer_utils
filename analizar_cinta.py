@@ -47,7 +47,7 @@ def aplicar_clahe(image, clipLimit=2.0, tileGridSize=(8, 8)):
 
 
 def check_cinta_libre(
-    ref_image, current_image, pts, umbral=15, varThreshold=35, metodo=0
+    ref_image, current_image, pts, umbral=15, varThreshold=35, metodo=1
 ):
     """
     ref_image: Imagen de referencia
@@ -68,7 +68,7 @@ def check_cinta_libre(
     # Aplicar la máscara para extraer la ROI de ambas imágenes
     roi_ref = cv2.bitwise_and(ref_image, ref_image, mask=mask)
     roi_current = cv2.bitwise_and(current_image, current_image, mask=mask)
-    roi_current_o = roi_current.copy()
+    # roi_current_o = roi_current.copy()
 
     # Modelo prentrenado
     # directory_path = "./videos_capturados/Image_ref"
@@ -131,10 +131,6 @@ def check_cinta_libre(
         # Umbralizar la imagen de diferencia para obtener una imagen binaria
         _, diff_thresh = cv2.threshold(diff, 30, 255, cv2.THRESH_BINARY)
         ####################################
-    # cv2.imshow("Imagen inicial", roi_current_o)
-    # cv2.imshow("Imagen Mejorada", roi_current)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
 
     # Contar los píxeles en la ROI
     roi_pixel_count = np.count_nonzero(mask)
@@ -156,61 +152,9 @@ def check_cinta_libre(
     return diff, diff_thresh, flag, percentage_diff
 
 
-# # Con imágenes ###
-# if __name__ == "__main__":
-
-#     # Cargar la imagen de referencia (cinta sin productos) y la imagen actual
-#     ref_image = cv2.imread("./videos_capturados/camera245_640x480_ref.jpg")
-#     current_image = cv2.imread(
-#         "./videos_capturados/pruebas_cinta/1723739185806-00037.jpg"  # linea_de_caja_val/camera245_704x576_20240731_102519-00010.jpg
-#     )  # linea_de_caja_train/camera245_704x576_20240731_204910-00003.jpg / linea_de_caja_train/camera245_704x576_20240731_103532-00001
-#     current_image = cv2.imread(utils.seleccionar_imagen())
-
-#     # Definir los cuatro puntos de la ROI en ambas imágenes (en este caso, son iguales)
-#     pts = np.array([[102, 172], [101, 269], [129, 270], [128, 170]], dtype="int32")
-
-#     # ROI Grande: [[100, 169], [100, 270], [209, 277], [213, 163]]
-#     # ROI Chica : [[102, 172], [171, 168], [171, 275], [102, 271]]
-#     # ROI 20cm: [[102, 172], [101, 269], [129, 270], [128, 170]]
-
-#     # # Inicializar el sustractor de fondo
-#     # bg_subtractor = cv2.createBackgroundSubtractorMOG2(
-#     #     history=120, varThreshold=35, detectShadows=True
-#     # )
-
-#     # # Entrenar el modelo de fondo con imágenes de referencia
-#     # directory_path = "./videos_capturados/Image_ref"
-#     # image_files = utils.get_image_paths(directory_path)
-#     # mask = np.zeros(ref_image.shape[:2], dtype=np.uint8)
-
-#     # bg_subtractor_train = train_bg_subtractor(image_files, mask)
-
-#     # Correr la funcion
-#     diff, diff_thresh, flag, percentage_diff = check_cinta_libre(
-#         ref_image, current_image, pts, umbral=15, varThreshold=25
-#     )
-
-#     # Dibujar la ROI en ambas imágenes
-#     cv2.polylines(ref_image, [pts], isClosed=True, color=(0, 255, 0), thickness=2)
-#     cv2.polylines(current_image, [pts], isClosed=True, color=(0, 255, 0), thickness=2)
-
-#     print(f"Porcentaje de píxeles diferentes en la ROI: {percentage_diff:.2f}%")
-#     if flag:
-#         print("Área libre de objetos")
-#     else:
-#         print("Área ocupada por un objeto")
-
-#     # Mostrar las imágenes con la ROI dibujada
-#     cv2.imshow("Imagen de Referencia con ROI", ref_image)
-#     cv2.imshow("Imagen Actual con ROI", current_image)
-#     # cv2.imshow("Actual mejorada", roi_current)
-#     cv2.imshow("Diferencia original", diff)  # diff
-#     cv2.imshow("Diferencia con opening", diff_thresh)
-#     cv2.waitKey(0)
-#     cv2.destroyAllWindows()
-
-## Con video ###
+### Con imágenes ###
 if __name__ == "__main__":
+
     # Añadir parser para las variables umbral=15, varThreshold=25
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -225,39 +169,41 @@ if __name__ == "__main__":
     parser.add_argument(
         "--metodo",
         type=int,
-        default=0,
+        default=1,
         help="0: Diferencia absoluta, 1: Modelo de fondo MOG2",
+    )
+    parser.add_argument(
+        "--source", type=str, default="imagen", help="Ruta de la imagen actual"
     )
     args = parser.parse_args()
 
-    # Cargar la imagen de referencia (cinta sin productos)
+    # Cargar la imagen de referencia (cinta sin productos) y la imagen actual
     ref_image = cv2.imread("./videos_capturados/camera245_640x480_ref.jpg")
     average_image = cv2.imread("average_image_caja5.jpg")
-
-    # Cargar el video
-    video_path = utils.seleccionar_video()
-    cap = cv2.VideoCapture(video_path)
-
-    # Definir los cuatro puntos de la ROI
+    # Definir los cuatro puntos de la ROI en ambas imágenes (en este caso, son iguales)
     pts = np.array([[102, 172], [101, 269], [129, 270], [128, 170]], dtype="int32")
 
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:
-            break
+    # ROI Grande: [[100, 169], [100, 270], [209, 277], [213, 163]]
+    # ROI Chica : [[102, 172], [171, 168], [171, 275], [102, 271]]
+    # ROI 20cm: [[102, 172], [101, 269], [129, 270], [128, 170]]
 
-        # Procesar el frame actual
+    if args.source == "imagen":
+        current_image = cv2.imread(utils.seleccionar_imagen())
+        # Correr la funcion
         diff, diff_thresh, flag, percentage_diff = check_cinta_libre(
             average_image,
-            frame,
+            current_image,
             pts,
             umbral=args.umbral,
             varThreshold=args.varThreshold,
             metodo=args.metodo,
         )
 
-        # Dibujar la ROI en el frame actual
-        cv2.polylines(frame, [pts], isClosed=True, color=(0, 255, 0), thickness=2)
+        # Dibujar la ROI en ambas imágenes
+        cv2.polylines(ref_image, [pts], isClosed=True, color=(0, 255, 0), thickness=2)
+        cv2.polylines(
+            current_image, [pts], isClosed=True, color=(0, 255, 0), thickness=2
+        )
 
         print(f"Porcentaje de píxeles diferentes en la ROI: {percentage_diff:.2f}%")
         if flag:
@@ -265,15 +211,48 @@ if __name__ == "__main__":
         else:
             print("Área ocupada por un objeto")
 
-        # Mostrar el frame con la ROI dibujada y la imagen de diferencia
-        cv2.imshow("Frame Actual", frame)
-        cv2.imshow("Diferencia con Opening", diff_thresh)
-        cv2.imshow("Average", average_image)
+        # Mostrar las imágenes con la ROI dibujada
+        cv2.imshow("Imagen de Referencia con ROI", ref_image)
+        cv2.imshow("Imagen Actual con ROI", current_image)
+        cv2.imshow("Diferencia original", diff)  # diff
+        cv2.imshow("Diferencia con opening", diff_thresh)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+    else:
+        video_path = utils.seleccionar_video()
+        cap = cv2.VideoCapture(video_path)
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
 
-        # Esperar una tecla para pasar al siguiente frame
-        key = cv2.waitKey(0) & 0xFF
-        if key == ord("q"):  # Presionar 'q' para salir
-            break
+            # Procesar el frame actual
+            diff, diff_thresh, flag, percentage_diff = check_cinta_libre(
+                average_image,
+                frame,
+                pts,
+                umbral=args.umbral,
+                varThreshold=args.varThreshold,
+                metodo=args.metodo,
+            )
 
-    cap.release()
-    cv2.destroyAllWindows()
+            # Dibujar la ROI en el frame actual
+            cv2.polylines(frame, [pts], isClosed=True, color=(0, 255, 0), thickness=2)
+
+            print(f"Porcentaje de píxeles diferentes en la ROI: {percentage_diff:.2f}%")
+            if flag:
+                print("Área libre de objetos")
+            else:
+                print("Área ocupada por un objeto")
+
+            # Mostrar el frame con la ROI dibujada
+            cv2.imshow("Frame", frame)
+            cv2.imshow("Diferencia con opening", diff_thresh)
+            cv2.imshow("Average", average_image)
+
+            # Esperar una tecla para pasar al siguiente frame
+            key = cv2.waitKey(0) & 0xFF
+            if key == ord("q"):  # Presionar 'q' para salir
+                break
+        cap.release()
+        cv2.destroyAllWindows()
