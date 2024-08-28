@@ -233,6 +233,7 @@ if __name__ == "__main__":
         # Mostrar el frame con la ROI dibujada y la imagen de diferencia
         cv2.imshow("Frame Actual", frame)
         cv2.imshow("Diferencia con Opening", diff_thresh)
+        cv2.imshow("Average", average_image)
 
         # Esperar una tecla para pasar al siguiente frame
         key = cv2.waitKey(0) & 0xFF
