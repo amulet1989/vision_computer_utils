@@ -131,10 +131,10 @@ def check_cinta_libre(
         # Umbralizar la imagen de diferencia para obtener una imagen binaria
         _, diff_thresh = cv2.threshold(diff, 30, 255, cv2.THRESH_BINARY)
         ####################################
-    cv2.imshow("Imagen inicial", roi_current_o)
-    cv2.imshow("Imagen Mejorada", roi_current)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # cv2.imshow("Imagen inicial", roi_current_o)
+    # cv2.imshow("Imagen Mejorada", roi_current)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
     # Contar los píxeles en la ROI
     roi_pixel_count = np.count_nonzero(mask)
