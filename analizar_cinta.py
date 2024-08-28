@@ -57,7 +57,7 @@ def check_cinta_libre(ref_image, current_image, pts, umbral=15, varThreshold=35)
     roi_ref = cv2.bitwise_and(ref_image, ref_image, mask=mask)
     roi_current = cv2.bitwise_and(current_image, current_image, mask=mask)
 
-    # # Modelo prentrenado
+    # Modelo prentrenado
     # directory_path = "./videos_capturados/Image_ref"
     # image_files = utils.get_image_paths(
     #     directory_path
