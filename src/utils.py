@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog
 import cv2
 import os
+import numpy as np
 
 
 def seleccionar_video():
@@ -143,6 +144,8 @@ def get_image_paths(directory_path):
 
 # Convertir video en frames jpg
 def video_to_frames(video_path, output_folder):
+    # Obtener nombre del video sin la extensión
+    video_name = os.path.splitext(os.path.basename(video_path))[0]
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
     cap = cv2.VideoCapture(video_path)
@@ -151,7 +154,33 @@ def video_to_frames(video_path, output_folder):
         ret, frame = cap.read()
         if not ret:
             break
-        frame_path = os.path.join(output_folder, f"frame_{frame_count}.jpg")
+        frame_path = os.path.join(output_folder, f"{video_name}_{frame_count}.jpg")
         cv2.imwrite(frame_path, frame)
         frame_count += 1
     cap.release()
+
+
+# Obtener imagen average
+def get_im_avg(directory_path, mask=None, name="average_image"):
+
+    image_files = get_image_paths(directory_path)  # Lista de imágenes de referencia
+
+    accumulated_image = cv2.imread(image_files[0]).astype(np.float32)
+    # Entrenar el modelo de fondo con múltiples imágenes de referencia
+    for image_file in image_files:
+        ref_image = cv2.imread(image_file)
+        accumulated_image = cv2.add(accumulated_image, ref_image.astype(np.float32))
+
+    # Dividir por el número de imágenes para obtener la imagen promedio
+    average_image = accumulated_image / len(image_files)
+
+    # Convertir de nuevo a formato de imagen (uint8)
+    average_image = np.clip(average_image, 0, 255).astype(np.uint8)
+
+    if mask is not None:
+        average_image = cv2.bitwise_and(average_image, average_image, mask=mask)
+
+    # # Guardar o mostrar la imagen promedio
+    cv2.imwrite(f"{directory_path}/{name}.jpg", average_image)
+
+    return average_image

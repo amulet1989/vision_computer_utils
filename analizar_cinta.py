@@ -70,16 +70,6 @@ def check_cinta_libre(
     roi_current = cv2.bitwise_and(current_image, current_image, mask=mask)
     # roi_current_o = roi_current.copy()
 
-    # Modelo prentrenado
-    # directory_path = "./videos_capturados/Image_ref"
-    # image_files = utils.get_image_paths(
-    #     directory_path
-    # )  # Lista de imágenes de referencia
-
-    # # Entrenar el modelo de fondo con imágenes de referencia
-    # imag_prom = train_bg_subtractor(image_files, mask)
-    # imag_prom = cv2.imread("average_image.jpg")
-
     if metodo == 1:
         #####################################################
         ###### Usar un modelo de sustracción de fondo ######
@@ -175,16 +165,25 @@ if __name__ == "__main__":
     parser.add_argument(
         "--source", type=str, default="imagen", help="Ruta de la imagen actual"
     )
+    parser.add_argument("--caja", type=int, default=0, help="Nro de caja en la lista")
     args = parser.parse_args()
 
     # Cargar la imagen de referencia (cinta sin productos) y la imagen actual
-    ref_image = cv2.imread("./videos_capturados/camera245_640x480_ref.jpg")
-    average_image = cv2.imread("average_image_caja5.jpg")
-    # Definir los cuatro puntos de la ROI en ambas imágenes (en este caso, son iguales)
-    pts = np.array([[102, 172], [101, 269], [129, 270], [128, 170]], dtype="int32")
+    # ref_image = cv2.imread("./videos_capturados/camera245_640x480_ref.jpg")
+    images = ["image_ref_caja5.jpg", "image_ref_caja6.jpg", "image_ref_caja7.jpg"]
+    average_image = cv2.imread(images[args.caja])
 
-    # ROI Grande: [[100, 169], [100, 270], [209, 277], [213, 163]]
-    # ROI Chica : [[102, 172], [171, 168], [171, 275], [102, 271]]
+    # Definir los cuatro puntos de la ROI en ambas imágenes (en este caso, son iguales)
+    rois = [
+        [[102, 172], [101, 269], [129, 270], [128, 170]],
+        [[104, 184], [101, 275], [130, 277], [129, 182]],
+        [[113, 157], [104, 260], [134, 262], [139, 155]],
+    ]
+    pts = np.array(rois[args.caja], dtype="int32")
+    # Caja5 [[102, 172], [101, 269], [129, 270], [128, 170]]
+    # Caja6 [[104, 184], [101, 275], [130, 277], [129, 182]]
+    # Caja7 [[113, 157], [104, 260], [134, 262], [139, 155]]
+
     # ROI 20cm: [[102, 172], [101, 269], [129, 270], [128, 170]]
 
     if args.source == "imagen":
@@ -200,7 +199,9 @@ if __name__ == "__main__":
         )
 
         # Dibujar la ROI en ambas imágenes
-        cv2.polylines(ref_image, [pts], isClosed=True, color=(0, 255, 0), thickness=2)
+        cv2.polylines(
+            average_image, [pts], isClosed=True, color=(0, 255, 0), thickness=2
+        )
         cv2.polylines(
             current_image, [pts], isClosed=True, color=(0, 255, 0), thickness=2
         )
@@ -212,7 +213,7 @@ if __name__ == "__main__":
             print("Área ocupada por un objeto")
 
         # Mostrar las imágenes con la ROI dibujada
-        cv2.imshow("Imagen de Referencia con ROI", ref_image)
+        cv2.imshow("Imagen de Referencia con ROI", average_image)
         cv2.imshow("Imagen Actual con ROI", current_image)
         cv2.imshow("Diferencia original", diff)  # diff
         cv2.imshow("Diferencia con opening", diff_thresh)
