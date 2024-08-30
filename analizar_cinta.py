@@ -250,6 +250,7 @@ if __name__ == "__main__":
 
             # Mostrar el frame con la ROI dibujada
             cv2.imshow("Frame", frame)
+            cv2.imshow("Diferencia original", diff)  # diff
             cv2.imshow("Diferencia con opening", diff_thresh)
             cv2.imshow("Average", average_image)
 
