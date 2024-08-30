@@ -31,21 +31,21 @@ import numpy as np
 ##############################
 
 #### Convertir un video en imagenes ####
-# video_path = utils.seleccionar_video()
-# # obtener directorio base del video
-# base_path = os.path.dirname(video_path)
-# utils.video_to_frames(video_path, os.path.join(base_path, "frames_video"))
+video_path = utils.seleccionar_video()
+# obtener directorio base del video
+base_path = os.path.dirname(video_path)
+utils.video_to_frames(video_path, os.path.join(base_path, "frames_video"))
 ##########################################
 
 #### Obtener imagen de referencia ####
-pts = np.array([[104, 184], [101, 275], [130, 277], [129, 182]], dtype="int32")
-# Caja5 [[102, 172], [101, 269], [129, 270], [128, 170]]
-# Caja6 [[104, 184], [101, 275], [130, 277], [129, 182]]
-# Caja7 [[113, 157], [104, 260], [134, 262], [139, 155]]
-mask = np.zeros((480, 640), dtype=np.uint8)
-cv2.fillConvexPoly(mask, pts, 255)
-directory_path = utils.seleccionar_directorio()  # "./videos_capturados/Image_ref"
-imag_prom = utils.get_im_avg(
-    directory_path, mask, name="image_ref_caja6"
-)  # Obtener imagen promedio
+# pts = np.array([[113, 157], [104, 260], [134, 262], [139, 155]], dtype="int32")
+# # Caja5 [[102, 172], [101, 269], [129, 270], [128, 170]]
+# # Caja6 [[104, 184], [101, 275], [130, 277], [129, 182]]
+# # Caja7 [[113, 157], [104, 260], [134, 262], [139, 155]]
+# mask = np.zeros((480, 640), dtype=np.uint8)
+# cv2.fillConvexPoly(mask, pts, 255)
+# directory_path = utils.seleccionar_directorio()  # "./videos_capturados/Image_ref"
+# imag_prom = utils.get_im_avg(
+#     directory_path, mask, name="image_ref_caja7"
+# )  # Obtener imagen promedio
 ########################################

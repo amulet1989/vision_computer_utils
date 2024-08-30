@@ -179,6 +179,7 @@ def get_im_avg(directory_path, mask=None, name="average_image"):
 
     if mask is not None:
         average_image = cv2.bitwise_and(average_image, average_image, mask=mask)
+        # average_image = cv2.bitwise_and(ref_image, ref_image, mask=mask)
 
     # # Guardar o mostrar la imagen promedio
     cv2.imwrite(f"{directory_path}/{name}.jpg", average_image)
