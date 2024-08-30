@@ -185,3 +185,12 @@ def get_im_avg(directory_path, mask=None, name="average_image"):
     cv2.imwrite(f"{directory_path}/{name}.jpg", average_image)
 
     return average_image
+
+
+# def aplicar_clahe(image, clipLimit=2.0, tileGridSize=(8, 8)):
+#     lab_image = cv2.cvtColor(image, cv2.COLOR_BGR2Lab)
+#     l_channel, a, b = cv2.split(lab_image)
+#     clahe = cv2.createCLAHE(clipLimit=clipLimit, tileGridSize=tileGridSize)
+#     l_channel_clahe = clahe.apply(l_channel)
+#     lab_image_clahe = cv2.merge((l_channel_clahe, a, b))
+#     return cv2.cvtColor(lab_image_clahe, cv2.COLOR_Lab2BGR)

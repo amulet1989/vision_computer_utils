@@ -1,82 +1,44 @@
 import cv2
 import numpy as np
+
+# Necesario solo para hacer pruebas las imagenes y videos de prueba
 from src import utils
-import pickle
-from sys import argv
 import argparse
 
 
-def train_bg_subtractor(image_files, mask):
-
-    # Inicializar el sustractor de fondo
-    # bg_subtractor = cv2.createBackgroundSubtractorMOG2(
-    #     history=120, varThreshold=35, detectShadows=True
-    # )
-    accumulated_image = cv2.imread(image_files[0]).astype(np.float32)
-    # Entrenar el modelo de fondo con múltiples imágenes de referencia
-    for image_file in image_files:
-        ref_image = cv2.imread(image_file)
-        # Aplicar la máscara para extraer la ROI de ambas imágenes
-        # roi_ref = cv2.bitwise_and(ref_image, ref_image, mask=mask)
-        accumulated_image = cv2.add(accumulated_image, ref_image.astype(np.float32))
-        # bg_subtractor.apply(roi_ref, learningRate=1.0)
-
-    # Dividir por el número de imágenes para obtener la imagen promedio
-    average_image = accumulated_image / len(image_files)
-
-    # Convertir de nuevo a formato de imagen (uint8)
-    average_image = np.clip(average_image, 0, 255).astype(np.uint8)
-    average_image = cv2.bitwise_and(average_image, average_image, mask=mask)
-
-    # # Guardar o mostrar la imagen promedio
-    cv2.imwrite("average_image_caja5.jpg", average_image)
-    # cv2.imshow("Imagen Promedio", average_image)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
-
-    return average_image
-
-
-def aplicar_clahe(image, clipLimit=2.0, tileGridSize=(8, 8)):
-    lab_image = cv2.cvtColor(image, cv2.COLOR_BGR2Lab)
-    l_channel, a, b = cv2.split(lab_image)
-    clahe = cv2.createCLAHE(clipLimit=clipLimit, tileGridSize=tileGridSize)
-    l_channel_clahe = clahe.apply(l_channel)
-    lab_image_clahe = cv2.merge((l_channel_clahe, a, b))
-    return cv2.cvtColor(lab_image_clahe, cv2.COLOR_Lab2BGR)
-
-
 def check_cinta_libre(
-    ref_image, current_image, pts, umbral=15, varThreshold=75, metodo=1
+    ref_image, current_image, pts, umbral=15, varThreshold=40, metodo=0
 ):
     """
     ref_image: Imagen de referencia
     current_image: Imagen actual
     pts: Puntos de la ROI (polígono)
     umbral: Umbral de porcentaje de diferencia (por defecto 15%)
-    varThreshold: Umbral de detección de cambios en el fondo (por defecto MOG2-75, DiffAbs-35) mientras más bajo más sensible a los cambios
+    varThreshold: Umbral de detección de cambios en el fondo (por defecto MOG2-75, DiffAbs-40) mientras más bajo más sensible a los cambios
     metodo: 0: Diferencia absoluta, 1: Modelo de fondo MOG2
     return: diff, diff_thresh, flag, percentage_diff
     flag=True: Área libre de objetos
     flag=False: Área ocupada por un objeto
 
+    Ejemplo de uso:
+    _, _, flag, percentage_diff = check_cinta_libre(ref_image, current_image, pts, umbral=15, varThreshold=40, metodo=0)
+
     """
     # Crear una máscara de la ROI
-    mask = np.zeros((480, 640), dtype=np.uint8)
+    mask = np.zeros(ref_image.shape[:2], dtype=np.uint8)
     cv2.fillConvexPoly(mask, pts, 255)
 
     # Aplicar la máscara para extraer la ROI de ambas imágenes
     roi_ref = cv2.bitwise_and(ref_image, ref_image, mask=mask)
     roi_current = cv2.bitwise_and(current_image, current_image, mask=mask)
-    # roi_current_o = roi_current.copy()
 
     if metodo == 1:
         #####################################################
         ###### Usar un modelo de sustracción de fondo ######
         #####################################################
         # Mejorar contraste con CLAHE
-        # roi_ref = aplicar_clahe(roi_ref)
-        # roi_current = aplicar_clahe(roi_current)
+        # roi_ref = utils.aplicar_clahe(roi_ref)
+        # roi_current = utils.aplicar_clahe(roi_current)
         ##########################################
 
         # Inicializar el sustractor de fondo
@@ -84,7 +46,6 @@ def check_cinta_libre(
         bg_subtractor = cv2.createBackgroundSubtractorMOG2(
             history=1, varThreshold=varThreshold, detectShadows=True
         )
-        # bg_subtractor = train_bg_subtractor(bg_subtractor, image_files, mask)
 
         # Aplicar la sustracción de fondo
         # Alimentar el sustractor con la imagen de referencia para que aprenda el fondo
@@ -99,19 +60,16 @@ def check_cinta_libre(
 
         # Volver a circunscribir la imagen resultante a la ROI
         diff_thresh = cv2.bitwise_and(diff_thresh, diff_thresh, mask=mask)
-        # diff_thresh = cv2.bitwise_and(diff, diff, mask=mask)
-        # ########################################################
+        #########################################################
     else:
         ######################################
         ###### Usar diferencia absoluta ######
         ######################################
 
         # Mejorar contraste con CLAHE
-        # roi_ref = aplicar_clahe(roi_ref)
-        # roi_current = aplicar_clahe(roi_current)
+        # roi_ref = utils.aplicar_clahe(roi_ref)
+        # roi_current = utils.aplicar_clahe(roi_current)
         ##########################################
-        if varThreshold == 75:
-            varThreshold = 35
 
         # # Diferencia en escala de grises
         # roi_ref_gray = cv2.cvtColor(roi_ref, cv2.COLOR_BGR2GRAY)
@@ -120,6 +78,7 @@ def check_cinta_libre(
         # # Calcular la diferencia absoluta entre la imagen de referencia y la imagen actual
         # diff = cv2.absdiff(roi_ref_gray, roi_current_gray)
         ###############################################
+
         # Calcular la diferencia absoluta para cada canal RGB
         diff_B = cv2.absdiff(roi_ref[:, :, 0], roi_current[:, :, 0])
         diff_G = cv2.absdiff(roi_ref[:, :, 1], roi_current[:, :, 1])
@@ -128,26 +87,9 @@ def check_cinta_libre(
         # Crear una imagen de diferencia tomando el valor máximo de los tres canales en cada píxel
         diff = cv2.max(cv2.max(diff_B, diff_G), diff_R)
         ###############################################
-        # # Convertir las imágenes al espacio de color LAB
-        # roi_ref_lab = cv2.cvtColor(roi_ref, cv2.COLOR_BGR2LAB)
-        # roi_current_lab = cv2.cvtColor(roi_current, cv2.COLOR_BGR2LAB)
 
-        # # Separar los canales LAB
-        # L_ref, A_ref, B_ref = cv2.split(roi_ref_lab)
-        # L_current, A_current, B_current = cv2.split(roi_current_lab)
-
-        # # Calcular la diferencia absoluta para cada canal
-        # diff_L = cv2.absdiff(L_ref, L_current)
-        # diff_A = cv2.absdiff(A_ref, A_current)
-        # diff_B = cv2.absdiff(B_ref, B_current)
-
-        # # Crear una imagen de diferencia tomando el valor máximo de los tres canales en cada píxel
-        # diff = cv2.max(cv2.max(diff_L, diff_A), diff_B)
-        ##################################################
         # Umbralizar la imagen de diferencia para obtener una imagen binaria
         _, diff_thresh = cv2.threshold(diff, varThreshold, 255, cv2.THRESH_BINARY)
-
-        ####################################
 
     # Contar los píxeles en la ROI
     roi_pixel_count = np.count_nonzero(mask)
@@ -169,7 +111,7 @@ def check_cinta_libre(
     return diff, diff_thresh, flag, percentage_diff
 
 
-### Con imágenes ###
+### Probar el método con imágenes o con videos ###
 if __name__ == "__main__":
 
     # Añadir parser para las variables umbral=15, varThreshold=25
@@ -180,27 +122,31 @@ if __name__ == "__main__":
     parser.add_argument(
         "--varThreshold",
         type=int,
-        default=75,
+        default=40,
         help="Umbral de detección de cambios en el fondo",
     )
     parser.add_argument(
         "--metodo",
         type=int,
-        default=1,
+        default=0,
         help="0: Diferencia absoluta, 1: Modelo de fondo MOG2",
     )
     parser.add_argument(
-        "--source", type=str, default="imagen", help="Ruta de la imagen actual"
+        "--source",
+        type=str,
+        default="imagen",
+        help="Procesar una imagen, de lo contrario un video",
     )
-    parser.add_argument("--caja", type=int, default=0, help="Nro de caja en la lista")
+    parser.add_argument(
+        "--caja", type=int, default=0, help="Nro de caja a procesar de la lista"
+    )
     args = parser.parse_args()
 
-    # Cargar la imagen de referencia (cinta sin productos) y la imagen actual
-    # ref_image = cv2.imread("./videos_capturados/camera245_640x480_ref.jpg")
+    # Cargar la imagen de referencia (cinta sin productos)
     images = ["image_ref_caja5.jpg", "image_ref_caja6.jpg", "image_ref_caja7.jpg"]
     average_image = cv2.imread(images[args.caja])
 
-    # Definir los cuatro puntos de la ROI en ambas imágenes (en este caso, son iguales)
+    # Definir los cuatro puntos de la ROI
     rois = [
         [[102, 172], [101, 269], [129, 270], [128, 170]],
         [[104, 184], [101, 275], [130, 277], [129, 182]],
@@ -211,11 +157,11 @@ if __name__ == "__main__":
     # Caja6 [[104, 184], [101, 275], [130, 277], [129, 182]]
     # Caja7 [[113, 157], [104, 260], [134, 262], [139, 155]]
 
-    # ROI 20cm: [[102, 172], [101, 269], [129, 270], [128, 170]]
-
     if args.source == "imagen":
+        # Seleccionar imagen actual
         current_image = cv2.imread(utils.seleccionar_imagen())
-        # Correr la funcion
+
+        #### Correr la funcion check_cinta_libre() ####
         diff, diff_thresh, flag, percentage_diff = check_cinta_libre(
             average_image,
             current_image,
@@ -246,7 +192,8 @@ if __name__ == "__main__":
         cv2.imshow("Diferencia con opening", diff_thresh)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
-    else:
+    else:  # Si es un video
+        # Elegir el video
         video_path = utils.seleccionar_video()
         cap = cv2.VideoCapture(video_path)
         while cap.isOpened():
