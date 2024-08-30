@@ -112,13 +112,38 @@ def check_cinta_libre(
         ##########################################
         if varThreshold == 75:
             varThreshold = 35
-        # Convertir a escala de grises
-        roi_ref_gray = cv2.cvtColor(roi_ref, cv2.COLOR_BGR2GRAY)
-        roi_current_gray = cv2.cvtColor(roi_current, cv2.COLOR_BGR2GRAY)
 
-        # Calcular la diferencia absoluta entre la imagen de referencia y la imagen actual
-        diff = cv2.absdiff(roi_ref_gray, roi_current_gray)
+        # # Diferencia en escala de grises
+        # roi_ref_gray = cv2.cvtColor(roi_ref, cv2.COLOR_BGR2GRAY)
+        # roi_current_gray = cv2.cvtColor(roi_current, cv2.COLOR_BGR2GRAY)
 
+        # # Calcular la diferencia absoluta entre la imagen de referencia y la imagen actual
+        # diff = cv2.absdiff(roi_ref_gray, roi_current_gray)
+        ###############################################
+        # Calcular la diferencia absoluta para cada canal RGB
+        diff_B = cv2.absdiff(roi_ref[:, :, 0], roi_current[:, :, 0])
+        diff_G = cv2.absdiff(roi_ref[:, :, 1], roi_current[:, :, 1])
+        diff_R = cv2.absdiff(roi_ref[:, :, 2], roi_current[:, :, 2])
+
+        # Crear una imagen de diferencia tomando el valor máximo de los tres canales en cada píxel
+        diff = cv2.max(cv2.max(diff_B, diff_G), diff_R)
+        ###############################################
+        # # Convertir las imágenes al espacio de color LAB
+        # roi_ref_lab = cv2.cvtColor(roi_ref, cv2.COLOR_BGR2LAB)
+        # roi_current_lab = cv2.cvtColor(roi_current, cv2.COLOR_BGR2LAB)
+
+        # # Separar los canales LAB
+        # L_ref, A_ref, B_ref = cv2.split(roi_ref_lab)
+        # L_current, A_current, B_current = cv2.split(roi_current_lab)
+
+        # # Calcular la diferencia absoluta para cada canal
+        # diff_L = cv2.absdiff(L_ref, L_current)
+        # diff_A = cv2.absdiff(A_ref, A_current)
+        # diff_B = cv2.absdiff(B_ref, B_current)
+
+        # # Crear una imagen de diferencia tomando el valor máximo de los tres canales en cada píxel
+        # diff = cv2.max(cv2.max(diff_L, diff_A), diff_B)
+        ##################################################
         # Umbralizar la imagen de diferencia para obtener una imagen binaria
         _, diff_thresh = cv2.threshold(diff, varThreshold, 255, cv2.THRESH_BINARY)
 
