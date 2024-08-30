@@ -47,14 +47,14 @@ def aplicar_clahe(image, clipLimit=2.0, tileGridSize=(8, 8)):
 
 
 def check_cinta_libre(
-    ref_image, current_image, pts, umbral=15, varThreshold=35, metodo=1
+    ref_image, current_image, pts, umbral=15, varThreshold=75, metodo=1
 ):
     """
     ref_image: Imagen de referencia
     current_image: Imagen actual
     pts: Puntos de la ROI (polígono)
     umbral: Umbral de porcentaje de diferencia (por defecto 15%)
-    varThreshold: Umbral de detección de cambios en el fondo (por defecto 35) mientras más bajo más sensible a los cambios
+    varThreshold: Umbral de detección de cambios en el fondo (por defecto MOG2-75, DiffAbs-35) mientras más bajo más sensible a los cambios
     metodo: 0: Diferencia absoluta, 1: Modelo de fondo MOG2
     return: diff, diff_thresh, flag, percentage_diff
     flag=True: Área libre de objetos
@@ -110,7 +110,8 @@ def check_cinta_libre(
         # roi_ref = aplicar_clahe(roi_ref)
         # roi_current = aplicar_clahe(roi_current)
         ##########################################
-
+        if varThreshold == 75:
+            varThreshold = 35
         # Convertir a escala de grises
         roi_ref_gray = cv2.cvtColor(roi_ref, cv2.COLOR_BGR2GRAY)
         roi_current_gray = cv2.cvtColor(roi_current, cv2.COLOR_BGR2GRAY)
@@ -119,7 +120,8 @@ def check_cinta_libre(
         diff = cv2.absdiff(roi_ref_gray, roi_current_gray)
 
         # Umbralizar la imagen de diferencia para obtener una imagen binaria
-        _, diff_thresh = cv2.threshold(diff, 30, 255, cv2.THRESH_BINARY)
+        _, diff_thresh = cv2.threshold(diff, varThreshold, 255, cv2.THRESH_BINARY)
+
         ####################################
 
     # Contar los píxeles en la ROI
@@ -153,7 +155,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--varThreshold",
         type=int,
-        default=25,
+        default=75,
         help="Umbral de detección de cambios en el fondo",
     )
     parser.add_argument(
