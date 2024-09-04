@@ -122,6 +122,7 @@ def mostrar_imagen_con_poligonos(poligonos):
             x = poligono[0::2]
             y = poligono[1::2]
             ax2.plot(x + [x[0]], y + [y[0]], label=f"Polígono {i}")
+            ax1.plot(x + [x[0]], y + [y[0]], label=f"Polígono {i}")
     fig.canvas.draw()
 
 
