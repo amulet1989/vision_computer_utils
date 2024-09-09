@@ -6,12 +6,12 @@ from ultralytics import YOLO
 from src import utils
 import argparse
 
-# Cargar modelo
+# Cargar modelo YOLOv8m
 model = YOLO("trained_models/producto_cinta_yolov8seg_v3.pt")
-device = "cuda:0"  # "cuda:0" / "cpu"
 
 
-def model_infer(image, model=model, conf=0.4, classes=0):
+# Función para obtener las máscara binaria usando modelo YOLOv8 device -> ("cuda:0" / "cpu")
+def model_infer(image, model=model, conf=0.4, classes=0, device="cuda:0"):
     # Ejecutar inferencia en la imagen usando el modelo
     results = model(
         source=image,
@@ -25,18 +25,18 @@ def model_infer(image, model=model, conf=0.4, classes=0):
 
     # Obtener las máscaras de los objetos detectados
     masks = results[0].masks
-    if masks is None:
-        # Si no hay máscaras, devolver una imagen negra con las mismas dimensiones
-        black_image = np.zeros_like(image)
-        return black_image
-
-    # Obtener las coordenadas de las máscaras
-    mask_array = masks.xy
 
     # Crear una máscara binaria vacía
     binary_mask = np.zeros(
         image.shape[:2], dtype=np.uint8
     )  # Tamaño de la imagen (alto, ancho)
+
+    if masks is None:
+        # Si no hay máscaras, devolver una imagen negra con las mismas dimensiones
+        return binary_mask
+
+    # Obtener las coordenadas de las máscaras
+    mask_array = masks.xy
 
     # Dibujar las máscaras en la imagen binaria
     for mask in mask_array:
@@ -45,19 +45,13 @@ def model_infer(image, model=model, conf=0.4, classes=0):
             # Convierte cada conjunto de coordenadas en polígonos y rellénalos
             polygon = np.array(mask, dtype=np.int32)  # Asegurarse de que sean enteros
             cv2.fillPoly(binary_mask, [polygon], 255)
-        else:
-            print("No mask found")
-
-    # Opcional: superponer la máscara binaria a la imagen original para visualización
-    # overlay_image = image.copy()
-    # overlay_image[binary_mask == 1] = (0, 255, 0)  # Colorea la máscara en verde sobre la imagen original
 
     # Retornar la máscara binaria
     return binary_mask
 
 
 def check_cinta_libre(
-    ref_image, current_image, pts, umbral=15, varThreshold=40, metodo=0
+    ref_image, current_image, pts, umbral=15, varThreshold=40, metodo=0, conf=0.25
 ):
     """
     ref_image: Imagen de referencia
@@ -65,13 +59,14 @@ def check_cinta_libre(
     pts: Puntos de la ROI (polígono)
     umbral: Umbral de porcentaje de diferencia (por defecto 15%)
     varThreshold: Umbral de detección de cambios en el fondo (por defecto MOG2-75, DiffAbs-40) mientras más bajo más sensible a los cambios
-    metodo: 0: Diferencia absoluta, 1: Modelo de fondo MOG2
+    metodo: 0: Diferencia absoluta, 1: Modelo de fondo MOG2, otro valor: Modelo YOLOv8 segmentación
+    conf: Umbral de confianza para la detección de objetos (por defecto 0.25)
     return: diff, diff_thresh, flag, percentage_diff
     flag=True: Área libre de objetos
     flag=False: Área ocupada por un objeto
 
     Ejemplo de uso:
-    _, _, flag, percentage_diff = check_cinta_libre(ref_image, current_image, pts, umbral=15, varThreshold=40, metodo=0)
+    _, _, flag, percentage_diff = check_cinta_libre(ref_image, current_image, pts, umbral=15, varThreshold=40, metodo=0, conf=0.4)
 
     """
     # Crear una máscara de la ROI
@@ -111,6 +106,7 @@ def check_cinta_libre(
         # Volver a circunscribir la imagen resultante a la ROI
         diff_thresh = cv2.bitwise_and(diff_thresh, diff_thresh, mask=mask)
         #########################################################
+
     elif metodo == 0:
         ######################################
         ###### Usar diferencia absoluta ######
@@ -136,17 +132,22 @@ def check_cinta_libre(
 
         # Crear una imagen de diferencia tomando el valor máximo de los tres canales en cada píxel
         diff = cv2.max(cv2.max(diff_B, diff_G), diff_R)
-        ###############################################
 
         # Umbralizar la imagen de diferencia para obtener una imagen binaria
         _, diff_thresh = cv2.threshold(diff, varThreshold, 255, cv2.THRESH_BINARY)
+        #########################################################
 
-    else:  # usar modleo yolov8 segementación ultralytics
+    else:
         ################################################
-        ###### Usar modelo Yolov8 de segmentación ######
+        ###### Usar modelo YOLOv8 de segmentación ######
         ################################################
-        diff = model_infer(current_image, conf=0.4, classes=0)
+
+        # Hacer la inferencia y obtener la máscara
+        diff = model_infer(current_image, conf=conf, classes=0)
+
+        # Volver a circunscribir la imagen resultante a la ROI
         diff_thresh = cv2.bitwise_and(diff, diff, mask=mask)
+        ################################################
 
     # Contar los píxeles en la ROI
     roi_pixel_count = np.count_nonzero(mask)
