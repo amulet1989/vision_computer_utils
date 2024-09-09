@@ -11,7 +11,7 @@ model = YOLO("trained_models/producto_cinta_yolov8seg_v3.pt")
 
 
 # Función para obtener las máscara binaria usando modelo YOLOv8 device -> ("cuda:0" / "cpu")
-def model_infer(image, model=model, conf=0.4, classes=0, device="cuda:0"):
+def model_infer(image, model=model, conf=0.35, classes=0, device="cuda:0"):
     # Ejecutar inferencia en la imagen usando el modelo
     results = model(
         source=image,
@@ -50,6 +50,7 @@ def model_infer(image, model=model, conf=0.4, classes=0, device="cuda:0"):
     return binary_mask
 
 
+# Función principal para hacer el chequeo de la cinta usando uno d etres metodos disponibles
 def check_cinta_libre(
     ref_image, current_image, pts, umbral=15, varThreshold=40, metodo=0, conf=0.35
 ):
@@ -60,7 +61,7 @@ def check_cinta_libre(
     umbral: Umbral de porcentaje de diferencia (por defecto 15%)
     varThreshold: Umbral de detección de cambios en el fondo (por defecto MOG2-75, DiffAbs-40) mientras más bajo más sensible a los cambios
     metodo: 0: Diferencia absoluta, 1: Modelo de fondo MOG2, otro valor: Modelo YOLOv8 segmentación
-    conf: Umbral de confianza para la detección de objetos (por defecto 0.35)
+    conf: Umbral de confianza para la detección de objetos (por defecto 0.35) mientras más bajo más sensible
     return: diff, diff_thresh, flag, percentage_diff
     flag=True: Área libre de objetos
     flag=False: Área ocupada por un objeto
