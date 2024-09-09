@@ -1,9 +1,59 @@
 import cv2
 import numpy as np
+from ultralytics import YOLO
 
 # Necesario solo para hacer pruebas las imagenes y videos de prueba
 from src import utils
 import argparse
+
+# Cargar modelo
+model = YOLO("trained_models/producto_cinta_yolov8seg_v3.pt")
+device = "cuda:0"  # "cuda:0" / "cpu"
+
+
+def model_infer(image, model=model, conf=0.4, classes=0):
+    # Ejecutar inferencia en la imagen usando el modelo
+    results = model(
+        source=image,
+        device=device,
+        save=False,
+        conf=conf,
+        classes=classes,
+        retina_masks=True,
+        verbose=False,
+    )
+
+    # Obtener las máscaras de los objetos detectados
+    masks = results[0].masks
+    if masks is None:
+        # Si no hay máscaras, devolver una imagen negra con las mismas dimensiones
+        black_image = np.zeros_like(image)
+        return black_image
+
+    # Obtener las coordenadas de las máscaras
+    mask_array = masks.xy
+
+    # Crear una máscara binaria vacía
+    binary_mask = np.zeros(
+        image.shape[:2], dtype=np.uint8
+    )  # Tamaño de la imagen (alto, ancho)
+
+    # Dibujar las máscaras en la imagen binaria
+    for mask in mask_array:
+        # print("Mask coordinates:", mask)  # Debug: Imprimir coordenadas de la máscara
+        if len(mask) > 0:
+            # Convierte cada conjunto de coordenadas en polígonos y rellénalos
+            polygon = np.array(mask, dtype=np.int32)  # Asegurarse de que sean enteros
+            cv2.fillPoly(binary_mask, [polygon], 255)
+        else:
+            print("No mask found")
+
+    # Opcional: superponer la máscara binaria a la imagen original para visualización
+    # overlay_image = image.copy()
+    # overlay_image[binary_mask == 1] = (0, 255, 0)  # Colorea la máscara en verde sobre la imagen original
+
+    # Retornar la máscara binaria
+    return binary_mask
 
 
 def check_cinta_libre(
@@ -61,7 +111,7 @@ def check_cinta_libre(
         # Volver a circunscribir la imagen resultante a la ROI
         diff_thresh = cv2.bitwise_and(diff_thresh, diff_thresh, mask=mask)
         #########################################################
-    else:
+    elif metodo == 0:
         ######################################
         ###### Usar diferencia absoluta ######
         ######################################
@@ -90,6 +140,13 @@ def check_cinta_libre(
 
         # Umbralizar la imagen de diferencia para obtener una imagen binaria
         _, diff_thresh = cv2.threshold(diff, varThreshold, 255, cv2.THRESH_BINARY)
+
+    else:  # usar modleo yolov8 segementación ultralytics
+        ################################################
+        ###### Usar modelo Yolov8 de segmentación ######
+        ################################################
+        diff = model_infer(current_image, conf=0.4, classes=0)
+        diff_thresh = cv2.bitwise_and(diff, diff, mask=mask)
 
     # Contar los píxeles en la ROI
     roi_pixel_count = np.count_nonzero(mask)
