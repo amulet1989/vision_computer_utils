@@ -25,8 +25,8 @@ def concatenar_carpeta(camera_folder, output_folder):
         output_folder, f"{os.path.basename(camera_folder)}.mp4"
     )
     output_video = cv2.VideoWriter(
-        output_file_path, cv2.VideoWriter_fourcc(*"mp4v"), 10, (1920, 1080)
-    )
+        output_file_path, cv2.VideoWriter_fourcc(*"mp4v"), 10, (704, 576)
+    )  # (1920, 1080)
 
     # Iterate over the videos and concatenate them
     for video_file in video_files:
